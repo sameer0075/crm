@@ -56,7 +56,6 @@ const signupHandler = async (req: NextRequest): Promise<NextResponse> => {
 
   newUser = removeSensitiveFields(newUser, 'password');
 
-
   return NextResponse.json(
     {
       success: true,

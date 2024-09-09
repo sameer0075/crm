@@ -27,7 +27,7 @@ async function main() {
     data: {
       name: 'admin',
       email: 'admin@gmail.com',
-      password: 'password123',
+      password: '$2a$10$1BHeieHcRUpFOxIJyI8gPuqqOT.l7nPfOrD4ZoUHYRwSvqzo26MMy', // password123
       roleId: adminRole.id,
       company: 'Novatore Slutions',
     },

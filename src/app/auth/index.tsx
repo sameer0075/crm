@@ -4,6 +4,9 @@ import { EyeIcon, EyeOffIcon } from 'lucide-react';
 
 import Button from '../components/Button';
 import Input from '../components/Input';
+import { useDispatch } from 'react-redux';
+import { login } from '@/redux/slices/auth-slice';
+import { AppDispatch } from '@/redux/store';
 
 interface FormData {
   email: string;
@@ -19,13 +22,13 @@ interface FormData {
  */
 export default function Auth() {
   const [showPassword, setShowPassword] = React.useState(false);
-  /**
-   * The form data.
-   */
   const [formData, setFormData] = useState<FormData>({
     email: '',
     password: '',
   });
+  const [errors, setErrors] = useState({ email: '', password: '' });
+
+  const dispatch = useDispatch<AppDispatch>();
 
   /**
    * Handles changes to the form data.
@@ -38,13 +41,35 @@ export default function Auth() {
       ...prevData,
       [name]: value,
     }));
+
+    const validationValue = value.length > 0 ? `` : `${name} is required`;
+    setErrors((prevData: FormData) => ({
+      ...prevData,
+      [name]: validationValue,
+    }));
+  };
+
+  const validateForm = () => {
+    const newErrors: FormData = { email: '', password: '' };
+    if (!formData.password) {
+      newErrors.password = 'password is required';
+    }
+
+    if (!formData.email) {
+      newErrors.email = 'email is required';
+    }
+    setErrors(newErrors);
+    return newErrors.email === '' && newErrors.password === '';
   };
 
   /**
    * Handles the button click.
    */
   const handleClick = () => {
-    alert('Button clicked!');
+    const validation = validateForm();
+    if (validation) {
+      dispatch(login(formData));
+    }
   };
 
   return (
@@ -83,6 +108,9 @@ export default function Auth() {
                 onChange={(e) => handleChange(e)}
                 value={formData.email}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm">{errors.email}</p>
+              )}
             </div>
 
             <div className="space-y-2 relative">
@@ -114,6 +142,9 @@ export default function Auth() {
                     <EyeIcon className="w-5 h-5" />
                   )}
                 </button>
+                {errors.password && (
+                  <p className="text-red-500 text-sm">{errors.password}</p>
+                )}
               </div>
             </div>
             <div className="flex items-center space-x-2">
