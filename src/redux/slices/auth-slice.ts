@@ -16,7 +16,7 @@ export const login = createAsyncThunk(
       const url = `${AuthEndpoints.loginUser()}`;
       const resp = await api.post(`${url}`, data);
       return resp;
-    } catch (error: any) {
+    } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
   }
@@ -40,7 +40,7 @@ const authSlice = createSlice({
           window.location.href = '/dashboard';
         }, 2000);
       })
-      .addCase(login.rejected, (state, action: any) => {
+      .addCase(login.rejected, (state, action) => {
         toast.error(action.payload.message);
         state.isLoading = false;
       });
