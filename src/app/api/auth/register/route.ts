@@ -6,6 +6,7 @@ import { globalErrorHandler } from '@/lib/error-handling/error-handler';
 import { PrismaClient } from '@prisma/client';
 import { signupSchema } from '@/utils/schemas/auth.schema';
 import { StatusCode } from '@/utils/enums';
+import { removeSensitiveFields } from '@/utils/helper-functions';
 
 const prisma = new PrismaClient();
 
@@ -44,7 +45,7 @@ const signupHandler = async (req: NextRequest): Promise<NextResponse> => {
   }
 
   // Create the new user
-  const newUser = await prisma.user.create({
+  let newUser = await prisma.user.create({
     data: {
       name,
       email,
@@ -52,6 +53,9 @@ const signupHandler = async (req: NextRequest): Promise<NextResponse> => {
       roleId,
     },
   });
+
+  newUser = removeSensitiveFields(newUser, 'password');
+
 
   return NextResponse.json(
     {

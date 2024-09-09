@@ -4,3 +4,7 @@
 - copy contents from .env.example file
 - run command npm install
 - run command npm run dev
+- Seed Database command: npm run seed
+- Admin Credentials:
+    email: admin@gmail.com
+    password: password123
