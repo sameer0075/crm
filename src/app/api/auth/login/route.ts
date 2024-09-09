@@ -7,6 +7,7 @@ import { globalErrorHandler } from '@/lib/error-handling/error-handler';
 import { PrismaClient } from '@prisma/client';
 import { StatusCode } from '@/utils/enums';
 import { loginSchema } from '@/utils/schemas/auth.schema';
+import { removeSensitiveFields } from '@/utils/helper-functions';
 
 const prisma = new PrismaClient();
 
@@ -15,7 +16,7 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   const { email, password } = loginSchema.parse(body);
 
   // Find the user by email
-  const user = await prisma.user.findFirst({
+  let user = await prisma.user.findFirst({
     where: { email },
   });
 
@@ -29,6 +30,8 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   if (!isPasswordValid) {
     throw new ApiError(StatusCode.unauthorized, 'Invalid email or password');
   }
+
+  user = removeSensitiveFields(user, 'password');
 
   /// Ensure JWT_SECRET is defined
   const jwtSecret = process.env.JWT_SECRET;
