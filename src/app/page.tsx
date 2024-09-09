@@ -1,3 +1,8 @@
+import Auth from '../app/auth';
 export default function Home() {
-  return <div>Novatore CRM</div>;
+  return (
+    <div>
+      <Auth />
+    </div>
+  );
 }
