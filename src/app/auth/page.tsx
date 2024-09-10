@@ -1,10 +1,11 @@
 'use client';
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState, useEffect } from 'react';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 import Button from '../components/Button';
 import Input from '../components/Input';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { login } from '@/redux/slices/auth-slice';
 import { AppDispatch } from '@/redux/store';
 
@@ -28,7 +29,20 @@ export default function Auth() {
   });
   const [errors, setErrors] = useState({ email: '', password: '' });
 
+  const loading = useSelector((state) => state.auth.isLoading);
   const dispatch = useDispatch<AppDispatch>();
+  const router = useRouter();
+
+  const handleAthentication = () => {
+    const token = sessionStorage.getItem('token');
+    if (token) {
+      router.push('/leads');
+    }
+  };
+
+  useEffect(() => {
+    handleAthentication();
+  }, []);
 
   /**
    * Handles changes to the form data.
@@ -72,6 +86,12 @@ export default function Auth() {
     }
   };
 
+  const handleEnterPress = () => {
+    if (event.key === 'Enter') {
+      handleClick();
+    }
+  };
+
   return (
     <div className="flex flex-col min-h-screen md:flex-row max-h-[100vh]">
       <div className="flex mr-[20px] flex-col w-full p-16 space-y-8 bg-white md:w-1/2 md:p-16">
@@ -103,10 +123,11 @@ export default function Auth() {
                 name="email"
                 type="email"
                 required
-                className=" appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="h-[56px] appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 placeholder="Enter your email address"
                 onChange={(e) => handleChange(e)}
                 value={formData.email}
+                onKeyPress={handleEnterPress}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm">{errors.email}</p>
@@ -126,10 +147,11 @@ export default function Auth() {
                   name="password"
                   type={showPassword ? 'text' : 'password'}
                   required
-                  className="appearance-none block w-full px-3 py-2 w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-12 lg:pr-[45px]"
+                  className="h-[56px] appearance-none block w-full px-3 py-2 w-full border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm pr-12 lg:pr-[45px]"
                   placeholder="Enter your password"
                   onChange={handleChange}
                   value={formData.password}
+                  onKeyPress={handleEnterPress}
                 />
                 <button
                   type="button"
@@ -165,6 +187,7 @@ export default function Auth() {
               handleClick={handleClick}
               text="Login"
               className="h-14 w-full  gap-4"
+              loading={loading}
             />
           </form>
         </div>

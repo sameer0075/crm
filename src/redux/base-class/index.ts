@@ -25,7 +25,7 @@ class API {
     );
   }
 
-  private requestInterceptor(config: any) {
+  private requestInterceptor(config: T) {
     const token = sessionStorage.getItem('token');
     console.log('token data', token);
     if (token !== undefined && config.headers) {
@@ -65,11 +65,11 @@ class API {
     return this.instance.get(url, config).then(this.handleApiResponse);
   }
 
-  public post(url: string, data?: any, config?: AxiosRequestConfig) {
+  public post(url: string, data?: T, config?: AxiosRequestConfig) {
     return this.instance.post(url, data, config).then(this.handleApiResponse);
   }
 
-  public put(url: string, data?: any, config?: AxiosRequestConfig) {
+  public put(url: string, data?: T, config?: AxiosRequestConfig) {
     return this.instance.put(url, data, config).then(this.handleApiResponse);
   }
 

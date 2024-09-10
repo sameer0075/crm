@@ -59,4 +59,6 @@ const enum StatusCode {
   internalservererror = 500,
 }
 
-export { errorHanlderEnum, StatusCode };
+const RecordsEnum = ['LEAD', 'OPPORTUNITY', 'APPOINTMENT', 'DEAL'];
+
+export { errorHanlderEnum, StatusCode, RecordsEnum };

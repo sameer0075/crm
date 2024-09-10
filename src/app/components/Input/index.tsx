@@ -15,6 +15,7 @@ interface InputProps {
   className?: string;
   id?: string;
   value?: string;
+  onKeyPress?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 /**
@@ -32,6 +33,7 @@ const Input: React.FC<InputProps> = ({
   onChange,
   onBlur,
   className = '',
+  onKeyPress,
 }) => {
   return (
     <input
@@ -39,11 +41,12 @@ const Input: React.FC<InputProps> = ({
       name={name}
       type={type}
       required={required}
-      className={`h-[56px] appearance-none block lg:w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${className}`}
+      className={`appearance-none block lg:w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${className}`}
       placeholder={placeholder}
       onChange={onChange}
       onBlur={onBlur ? onBlur : undefined}
       value={value}
+      onKeyPress={onKeyPress}
     />
   );
 };

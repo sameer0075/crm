@@ -32,3 +32,22 @@ model role {
   description String?
   users       user[]
 }
+
+model records {
+  id          String  @id @default(uuid()) @db.Uuid
+  name  String
+  title String
+  email String
+  company String
+  phone String?
+  type  String
+  status String
+  website String?
+  industry String?
+  lead_source String
+  stage String? // for deals
+  date DateTime?
+  is_active Boolean? @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

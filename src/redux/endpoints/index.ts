@@ -2,4 +2,8 @@ const AuthEndpoints = {
   loginUser: () => `/auth/login`,
 };
 
-export { AuthEndpoints };
+const LeadEndpoints = {
+  leadsList: () => `/leads/list`,
+};
+
+export { AuthEndpoints, LeadEndpoints };
