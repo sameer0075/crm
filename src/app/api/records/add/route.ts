@@ -11,10 +11,17 @@ import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
 
 const prisma = new PrismaClient();
 
+/**
+ * The API handler for adding a new record.
+ *
+ * @param {NextRequest} req - The Next.js request object
+ * @returns {Promise<NextResponse>} - The response object with the new record information
+ */
 const addRecordHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();
   const payload = recordsSchema.parse(body);
 
+  // Check if a record with the same email or phone already exists
   const recordExists = await prisma.records.findFirst({
     where: {
       type: payload.type,
@@ -28,12 +35,14 @@ const addRecordHandler = async (req: NextRequest): Promise<NextResponse> => {
   });
 
   if (recordExists) {
+    // If the record already exists, throw a bad request error
     throw new ApiError(
       StatusCode.badrequest,
       'Record with this email or phone already exists'
     );
   }
 
+  // Create the new record
   const data = await prisma.records.create({
     data: payload,
   });

@@ -9,13 +9,21 @@ import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
 
 const prisma = new PrismaClient();
 
+/**
+ * Handles the GET request to fetch records by type.
+ *
+ * @param {NextRequest} req - The Next.js request object
+ * @returns {Promise<NextResponse>} - The response object with the records data
+ */
 const RecordsListHandler = async (req: NextRequest): Promise<NextResponse> => {
   const type = req.nextUrl.pathname.split('/').pop();
   if (!type) {
+    // 400 Bad Request if record type is not provided
     throw new ApiError(StatusCode.badrequest, 'Record type is required!');
   }
 
   if (!RecordsEnum.includes(type)) {
+    // 400 Bad Request if record type is invalid
     throw new ApiError(
       StatusCode.badrequest,
       'Record with such type doesn`t exist!'
@@ -29,10 +37,23 @@ const RecordsListHandler = async (req: NextRequest): Promise<NextResponse> => {
 
   return NextResponse.json(
     {
+      /**
+       * A boolean to indicate if the request was successful
+       * @type {boolean}
+       */
       success: true,
+      /**
+       * A message to describe the response
+       * @type {string}
+       */
       message: 'Records Fetched successfully',
+      /**
+       * The records data
+       * @type {Record[]}
+       */
       data: records,
     },
+    // 200 OK response
     { status: StatusCode.success }
   );
 };
