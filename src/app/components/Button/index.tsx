@@ -50,7 +50,6 @@ const Button: React.FC<ButtonProps> = ({
       ? 'bg-[#3673D4] hover:bg-blue-600 focus:ring-2 focus:ring-blue-300'
       : 'bg-gray-500 hover:bg-gray-600 focus:ring-2 focus:ring-gray-300';
 
-  console.log('loading', loading);
   return (
     <button
       type={type}

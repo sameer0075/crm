@@ -24,15 +24,18 @@ const initialState = {
   data: <RecordsInerface[]>null,
 };
 
-export const getLeads = createAsyncThunk('leads/list', async (thunkAPI) => {
-  try {
-    const url = `${LeadEndpoints.loginUser()}`;
-    const resp = await api.get(`${url}`);
-    return resp;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.response.data);
+export const getLeads = createAsyncThunk(
+  'leads/list',
+  async (type: string, thunkAPI) => {
+    try {
+      const url = `${LeadEndpoints.leadsList(type)}`;
+      const resp = await api.get(`${url}`);
+      return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 const leadsSlice = createSlice({
   name: 'leads',

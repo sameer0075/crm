@@ -27,9 +27,8 @@ class API {
 
   private requestInterceptor(config: T) {
     const token = sessionStorage.getItem('token');
-    console.log('token data', token);
-    if (token !== undefined && config.headers) {
-      config.headers.Authorization = `${token}`;
+    if (token !== undefined) {
+      config.headers.Authorization = `Bearer ${token}`;
     }
     return config;
   }

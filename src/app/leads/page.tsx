@@ -1,19 +1,33 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../components/Button';
 import { LeadLabels, LeadMockData } from '../components/mockdata/leads';
 import Table from '../components/Table';
+import { getLeads } from '@/redux/slices/lead-slice';
 
 const Leads = () => {
   const router = useRouter();
+  // const loading = useSelector((state) => state.leads.isLoading);
+  const data = useSelector((state) => state.leads.data);
+  const dispatch = useDispatch<AppDispatch>();
+  const [leads, setLeads] = useState([]);
+
   const handleAthentication = () => {
     const token = sessionStorage.getItem('token');
     if (!token) {
       router.push('/');
+    } else {
+      dispatch(getLeads('LEAD'));
     }
   };
+
+  useEffect(() => {
+    console.log('data', leads);
+    setLeads(data);
+  }, [data]);
 
   useEffect(() => {
     handleAthentication();
@@ -42,7 +56,7 @@ const Leads = () => {
       </div>
 
       <div className="m-8">
-        <Table labels={LeadLabels} data={LeadMockData} title="New Leads" />
+        <Table labels={LeadLabels} data={[]} title="New Leads" />
       </div>
     </div>
   );

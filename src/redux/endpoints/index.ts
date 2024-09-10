@@ -3,7 +3,7 @@ const AuthEndpoints = {
 };
 
 const LeadEndpoints = {
-  leadsList: () => `/leads/list`,
+  leadsList: (type: string) => `/records/list/${type}`,
 };
 
 export { AuthEndpoints, LeadEndpoints };
