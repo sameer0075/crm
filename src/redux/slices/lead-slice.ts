@@ -3,25 +3,33 @@ import { LeadEndpoints } from '../endpoints';
 import api from '../base-class';
 import { toast } from 'react-toastify';
 
-interface RecordsInerface {
+interface RecordsInterface {
   id: string;
-  name: string;
-  title: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  title?: string;
   email: string;
-  phone: string;
   company: string;
+  phone: string;
   type: string;
   status: string;
   website: string;
-  industry: string;
+  industry?: string;
   lead_source: string;
-  date: Date | string;
-  stage: string;
+  stage?: string; // For deals
+  date?: Date;
+  city?: string;
+  state?: string;
+  country?: string;
+  company_linkedin_url?: string;
+  linkedin_profile?: string;
+  is_active?: boolean;
 }
 
 const initialState = {
   isLoading: <boolean>false,
-  data: <RecordsInerface[]>null,
+  data: <RecordsInterface[]>null,
 };
 
 export const getLeads = createAsyncThunk(
@@ -30,6 +38,19 @@ export const getLeads = createAsyncThunk(
     try {
       const url = `${LeadEndpoints.leadsList(type)}`;
       const resp = await api.get(`${url}`);
+      return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const bulkUpload = createAsyncThunk(
+  'leads/bulk-upload',
+  async (data: FormData, thunkAPI) => {
+    try {
+      const url = `${LeadEndpoints.bulkUpload()}`;
+      const resp = await api.post(`${url}`, data);
       return resp;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -50,10 +71,43 @@ const leadsSlice = createSlice({
         state.isLoading = false;
         state.data = action.payload.data;
       })
-      .addCase(getLeads.rejected, (state, action) => {
-        toast.error(action.payload.message);
+      .addCase(
+        getLeads.rejected,
+        (state, action: { payload: { message: string } }) => {
+          if (action.payload.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action.payload.message);
+          state.isLoading = false;
+        }
+      )
+
+      .addCase(bulkUpload.pending, (state: { isLoading: boolean }) => {
+        state.isLoading = true;
+      })
+      .addCase(bulkUpload.fulfilled, (state, action) => {
         state.isLoading = false;
-      });
+        state.data = action.payload.data;
+      })
+      .addCase(
+        bulkUpload.rejected,
+        (
+          state: { isLoading: boolean },
+          action: { payload: { message: string } }
+        ) => {
+          if (action.payload.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action.payload.message);
+          state.isLoading = false;
+        }
+      );
   },
 });
 

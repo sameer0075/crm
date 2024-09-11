@@ -15,7 +15,7 @@ interface FormData {
 }
 
 /**
- * The authentication component.
+ * The authentication comhandleSubmitponent.
  *
  * This component renders the authentication form with email and password input fields,
  * and a button to submit the form. It also renders an image on the right side of the screen

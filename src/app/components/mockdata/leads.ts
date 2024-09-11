@@ -9,18 +9,18 @@ interface LeadIterface {
 }
 
 const LeadLabels = [
-  { label: 'name', header: 'Name', sortable: true },
+  { label: 'fullName', header: 'Name', sortable: true },
   { label: 'title', header: 'Title', sortable: true },
   { label: 'company', header: 'Company', sortable: true },
   { label: 'website', header: 'Company', sortable: true },
   { label: 'industry', header: 'Industry', sortable: true },
   { label: 'lead_source', header: 'Lead Source', sortable: true },
-  { label: 'created_at', header: 'Last Updated', sortable: false },
+  { label: 'updatedAt', header: 'Last Updated', sortable: false },
 ];
 
 const LeadMockData: LeadIterface[] = [
   {
-    name: 'Ameer Haider',
+    fullName: 'Ameer Haider',
     title: 'CEO & FOunder',
     company: 'Novatore Sols',
     website: 'novatoresols.com',
@@ -29,7 +29,7 @@ const LeadMockData: LeadIterface[] = [
     created_at: '05/08/2024',
   },
   {
-    name: 'Ameer Haider',
+    fullName: 'Ameer Haider',
     title: 'CEO & FOunder',
     company: 'Novatore Sols',
     website: 'novatoresols.com',
@@ -38,7 +38,7 @@ const LeadMockData: LeadIterface[] = [
     created_at: '05/08/2024',
   },
   {
-    name: 'Ameer Haider',
+    fullName: 'Ameer Haider',
     title: 'CEO & FOunder',
     company: 'Novatore Sols',
     website: 'novatoresols.com',

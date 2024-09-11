@@ -35,18 +35,25 @@ model role {
 
 model records {
   id          String  @id @default(uuid()) @db.Uuid
-  name  String
-  title String
+  firstName String
+  lastName String
+  fullName  String
+  title String?
   email String
   company String
-  phone String?
+  phone String
   type  String
-  status String
-  website String?
+  status String @default("ACTIVE")
+  website String
   industry String?
-  lead_source String
+  lead_source String @default("EMAIL")
   stage String? // for deals
   date DateTime?
+  city String?
+  state String?
+  country String?
+  company_linkedin_url String?
+  linkedin_profile String?
   is_active Boolean? @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

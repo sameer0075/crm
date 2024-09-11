@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "records" ALTER COLUMN "type" DROP DEFAULT,
+ALTER COLUMN "status" DROP DEFAULT;
