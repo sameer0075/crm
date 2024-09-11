@@ -1,5 +1,5 @@
 interface LeadIterface {
-  name: string;
+  fullName: string;
   title: string;
   company: string;
   website: string;
@@ -12,7 +12,7 @@ const LeadLabels = [
   { label: 'fullName', header: 'Name', sortable: true },
   { label: 'title', header: 'Title', sortable: true },
   { label: 'company', header: 'Company', sortable: true },
-  { label: 'website', header: 'Company', sortable: true },
+  { label: 'website', header: 'Website', sortable: true },
   { label: 'industry', header: 'Industry', sortable: true },
   { label: 'lead_source', header: 'Lead Source', sortable: true },
   { label: 'updatedAt', header: 'Last Updated', sortable: false },

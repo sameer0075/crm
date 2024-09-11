@@ -26,16 +26,50 @@ const validateEmail = (email: string | undefined) => {
     );
 };
 
+// utils/validateFile.ts
+
+const isValidFile = (file: File): boolean => {
+  const allowedMimeTypes = [
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Excel
+    'application/csv', // CSV
+    'text/csv', // CSV
+  ];
+
+  const allowedExtensions = ['.csv', '.xlsx'];
+
+  // Check MIME type
+  if (!allowedMimeTypes.includes(file.type)) {
+    console.log(`Invalid MIME type: ${file.type}`);
+    return false;
+  }
+
+  // Check file extension
+  const fileExtension = file.name
+    .slice(((file.name.lastIndexOf('.') - 1) >>> 0) + 2)
+    .toLowerCase();
+  console.log('fileExtension', fileExtension);
+  if (!allowedExtensions.includes(`.${fileExtension}`)) {
+    console.log(`Invalid file extension: .${fileExtension}`);
+    return false;
+  }
+
+  return true;
+};
+
 const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
   try {
     // Parse the form data
     const formData = await req.formData();
     const file = formData.get('file') as File;
-
     if (!file || !(file instanceof File)) {
-      return NextResponse.json(
-        { message: 'File is required' },
-        { status: 400 }
+      throw new ApiError(StatusCode.badrequest, 'File is required');
+    }
+    const validFile = !isValidFile(file);
+
+    if (validFile) {
+      throw new ApiError(
+        StatusCode.badrequest,
+        'Invalid file type. Only CSV and Excel files are allowed.'
       );
     }
 
@@ -177,7 +211,9 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
   } finally {
     const tempDir = join(process.cwd(), 'temp');
     const tempFilePath = join(tempDir, 'uploaded-file.xlsx');
-    await unlinkSync(tempFilePath);
+    if (existsSync(tempFilePath)) {
+      await unlinkSync(tempFilePath);
+    }
   }
 };
 // Compose and apply middlewares
