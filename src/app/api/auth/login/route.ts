@@ -43,7 +43,7 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   }
 
   // Generate and return a JWT token
-  const token = jwt.sign({ id: user.id }, jwtSecret, { expiresIn: '1h' });
+  const token = jwt.sign({ id: user.id }, jwtSecret, { expiresIn: '24h' });
 
   return NextResponse.json(
     {

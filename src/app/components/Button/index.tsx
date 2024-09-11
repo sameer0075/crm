@@ -28,6 +28,8 @@ interface ButtonProps {
   className?: string;
 
   loading?: boolean;
+
+  disabled?: boolean;
 }
 
 /**
@@ -42,6 +44,7 @@ const Button: React.FC<ButtonProps> = ({
   color = 'primary',
   className = '',
   loading = false,
+  disabled,
 }) => {
   const baseStyles =
     'px-4 py-2 rounded-lg text-white font-semibold transition duration-300';
@@ -55,7 +58,7 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
       onClick={handleClick}
       className={`${className} ${baseStyles} ${colorStyles}`}
-      disabled={loading === true}
+      disabled={disabled ? disabled : loading === true}
     >
       {loading ? (
         <div className="flex justify-center">

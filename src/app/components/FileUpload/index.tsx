@@ -112,6 +112,7 @@ export default function FileUpload({
             text="Submit"
             type="button"
             loading={loading}
+            disabled={file === null}
           />
           <Button
             handleClick={handleOpen}

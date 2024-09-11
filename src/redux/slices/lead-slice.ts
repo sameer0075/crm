@@ -91,6 +91,7 @@ const leadsSlice = createSlice({
       .addCase(bulkUpload.fulfilled, (state, action) => {
         state.isLoading = false;
         state.data = action.payload.data;
+        toast.info(action.payload.message);
       })
       .addCase(
         bulkUpload.rejected,
