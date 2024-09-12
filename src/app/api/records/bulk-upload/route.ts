@@ -39,7 +39,6 @@ const isValidFile = (file: File): boolean => {
 
   // Check MIME type
   if (!allowedMimeTypes.includes(file.type)) {
-    console.log(`Invalid MIME type: ${file.type}`);
     return false;
   }
 
@@ -47,9 +46,7 @@ const isValidFile = (file: File): boolean => {
   const fileExtension = file.name
     .slice(((file.name.lastIndexOf('.') - 1) >>> 0) + 2)
     .toLowerCase();
-  console.log('fileExtension', fileExtension);
   if (!allowedExtensions.includes(`.${fileExtension}`)) {
-    console.log(`Invalid file extension: .${fileExtension}`);
     return false;
   }
 
@@ -95,8 +92,9 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
 
     const workbook = new Workbook();
     await workbook.xlsx.readFile(tempFilePath);
-    const worksheet = workbook.getWorksheet(1);
-
+    const worksheet = workbook.getWorksheet(1)
+      ? workbook.getWorksheet(1)
+      : workbook.getWorksheet();
     // Check if worksheet exists
     if (!worksheet) {
       throw new ApiError(StatusCode.internalservererror, 'Worksheet not found');
@@ -105,9 +103,14 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
     const records = [];
     const existingEmails: string[] = [];
     const existingPhones: string[] = [];
+    const rows = [];
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       if (rowNumber === 1) return; // Skip header row
+      rows.push(row);
+    });
 
+    for (let i = 0; i < rows?.length; i++) {
+      const row = rows[i];
       const [
         company,
         website,
@@ -125,26 +128,45 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
         lead_source,
       ] = row.values.slice(1);
       const payload = {
-        company: String(company) ?? 'Test Company',
-        website: website?.hyperlink ?? 'www.test.com',
+        company: String(company),
+        website: String(website?.hyperlink),
         city,
         state,
         country,
         industry,
-        company_linkedin_url: company_linkedin_url?.hyperlink,
+        company_linkedin_url: String(company_linkedin_url?.hyperlink),
         firstName,
         lastName,
-        email: validateEmail(email)
-          ? email
-          : `test-email${new Date().getTime()}@gmail.com`,
-        fullName: `${firstName} ${lastName}`,
+        email: validateEmail(email) ? email : '',
+        fullName: `${firstName} ${lastName ?? ''}`,
         title,
-        linkedin_profile: linkedin_profile?.hyperlink,
-        phone: String(phone) ?? '090078601',
+        linkedin_profile: String(linkedin_profile?.hyperlink),
+        phone: String(phone),
         lead_source,
         type: 'LEAD',
         status: 'ACTIVE',
       };
+
+      try {
+        const recordExists = await prisma.records.findFirst({
+          where: {
+            type: payload.type,
+            OR: [{ email: payload.email }, { phone: payload.phone }],
+          },
+        });
+
+        if (recordExists) {
+          throw new ApiError(
+            StatusCode.badrequest,
+            `Record with this email or phone already exists. Check row number ${i + 2}`
+          );
+        }
+      } catch (error) {
+        throw new ApiError(
+          StatusCode.badrequest,
+          `Record with this email or phone already exists. Check line number ${i + 2}`
+        );
+      }
 
       try {
         const validatedPayload = recordsSchema.parse(payload);
@@ -152,37 +174,10 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
         if (validatedPayload.phone) existingPhones.push(validatedPayload.phone);
         records.push(validatedPayload);
       } catch (error) {
-        const message = `${error?.errors[0]?.code} ${error?.errors[0]?.message}. Error Occured at row number: ${rowNumber}`;
+        const message = `${error?.errors[0]?.message}. Error occurred at row number: ${row.number}`;
         throw new ApiError(StatusCode.internalservererror, message);
       }
-    });
-
-    const existingRecords = await prisma.records.findMany({
-      select: {
-        email: true,
-        phone: true,
-      },
-      where: {
-        OR: [
-          { email: { in: existingEmails } },
-          { phone: { in: Array.from(existingPhones) } },
-        ],
-      },
-    });
-
-    if (existingRecords.length > 0) {
-      return new NextResponse(
-        JSON.stringify({
-          error: true,
-          status: StatusCode.badrequest,
-          message: 'Some records already exist',
-          timestamp: new Date().getTime(),
-          existingRecords: existingRecords,
-        }),
-        { status: StatusCode.badrequest }
-      );
     }
-
     const response = [];
     // Insert data into the database in chunks to avoid memory issues
     const CHUNK_SIZE = 100; // Adjust based on your needs

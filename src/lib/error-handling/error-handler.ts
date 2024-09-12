@@ -23,7 +23,6 @@ export const globalErrorHandler =
         return NextResponse.json(ErrorPayload, { status: error.statusCode });
       } else {
         // Log server errors using your preferred logger
-        console.error(error);
         const ErrorPayload = errorHanlderEnum(req, error);
         // Return the error with the correct status code
         return NextResponse.json(ErrorPayload, { status: ErrorPayload.status });

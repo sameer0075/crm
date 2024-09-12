@@ -1,19 +1,29 @@
 import { z } from 'zod';
 
-const typeEnum = z.enum(['LEAD', 'OPPORTUNITY', 'APPOINTMENT', 'DEAL']);
-const leadSourceEnum = z.enum(['EMAIL', 'PHONE', 'BOTH']);
-const stageEnum = z.enum(['CLOSED', 'WITHDRAWN', 'WON', 'LOST']);
+const typeEnum = z
+  .enum(['LEAD', 'OPPORTUNITY', 'APPOINTMENT', 'DEAL'], {
+    required_error: 'Type is required', // Custom error message for required fields
+    invalid_type_error: 'Invalid Type',
+  })
+  .optional();
+const leadSourceEnum = z
+  .enum(['EMAIL', 'PHONE', 'BOTH'], {
+    required_error: 'Leadsource is required', // Custom error message for required fields
+    invalid_type_error: 'Invalid lead source',
+  })
+  .optional();
+const stageEnum = z.enum(['CLOSED', 'WITHDRAWN', 'WON', 'LOST']).optional();
 
 const recordsSchema = z.object({
-  firstName: z.string().min(1, 'First Name is required'),
-  lastName: z.string().min(1, 'Last Name is required'),
-  fullName: z.string().min(1, 'Name is required'),
-  email: z.string().email('Invalid email address'),
+  firstName: z.string().nonempty('First Name is required'),
+  lastName: z.string().nonempty('Last Name is required'),
+  fullName: z.string().nonempty('Name is required'),
+  email: z.string().nonempty('Invalid Email'),
   type: typeEnum,
   lead_source: leadSourceEnum,
-  website: z.string().min(1, 'Website is required'),
-  company: z.string().min(1, 'Company is required'),
-  phone: z.string().min(1, 'Phone is required'),
+  website: z.string().nonempty('Website is required'),
+  company: z.string().nonempty('Company is required'),
+  phone: z.string().nonempty('Phone is required'),
   date: z.date().optional(),
   stage: stageEnum.optional(),
   city: z.string().optional(),

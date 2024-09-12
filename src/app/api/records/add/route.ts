@@ -20,7 +20,6 @@ const prisma = new PrismaClient();
 const addRecordHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();
   const payload = recordsSchema.parse(body);
-  console.log('body', body);
   // Check if a record with the same email or phone already exists
   const recordExists = await prisma.records.findFirst({
     where: {
