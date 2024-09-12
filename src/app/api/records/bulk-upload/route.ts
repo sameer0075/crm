@@ -8,8 +8,13 @@ import { StatusCode } from '@/utils/enums';
 import { join } from 'path';
 import { Workbook } from 'exceljs';
 
-import { createWriteStream, existsSync, mkdirSync, unlinkSync } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
 import { recordsSchema } from '@/utils/schemas/records.schema';
+import {
+  fileHandling,
+  isValidFile,
+  validateEmail,
+} from '@/utils/helper-functions';
 const prisma = new PrismaClient();
 
 export const config = {
@@ -18,48 +23,13 @@ export const config = {
   },
 };
 
-const validateEmail = (email: string | undefined) => {
-  return String(email)
-    .toLowerCase()
-    .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-    );
-};
-
-// utils/validateFile.ts
-
-const isValidFile = (file: File): boolean => {
-  const allowedMimeTypes = [
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // Excel
-    'application/csv', // CSV
-    'text/csv', // CSV
-  ];
-
-  const allowedExtensions = ['.csv', '.xlsx'];
-
-  // Check MIME type
-  if (!allowedMimeTypes.includes(file.type)) {
-    return false;
-  }
-
-  // Check file extension
-  const fileExtension = file.name
-    .slice(((file.name.lastIndexOf('.') - 1) >>> 0) + 2)
-    .toLowerCase();
-  if (!allowedExtensions.includes(`.${fileExtension}`)) {
-    return false;
-  }
-
-  return true;
-};
-
 const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
   try {
     // Parse the form data
     const formData = await req.formData();
     const file = formData.get('file') as File;
     if (!file || !(file instanceof File)) {
-      throw new ApiError(StatusCode.badrequest, 'File is required');
+      throw new ApiError(StatusCode.badrequest, 'File is required.');
     }
     const validFile = !isValidFile(file);
 
@@ -73,22 +43,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
     const tempDir = join(process.cwd(), 'temp');
     const tempFilePath = join(tempDir, 'uploaded-file.xlsx'); // Assuming the file is Excel, not CSV
 
-    // Ensure the temp directory exists
-    if (!existsSync(tempDir)) {
-      mkdirSync(tempDir, { recursive: true });
-    }
-
-    // Save the file to a temporary location
-    const buffer = Buffer.from(await file.arrayBuffer());
-    const fileStream = createWriteStream(tempFilePath);
-    fileStream.write(buffer);
-    fileStream.end();
-
-    // Wait for the file stream to finish writing
-    await new Promise((resolve, reject) => {
-      fileStream.on('finish', resolve);
-      fileStream.on('error', reject);
-    });
+    await fileHandling(tempDir, tempFilePath, file);
 
     const workbook = new Workbook();
     await workbook.xlsx.readFile(tempFilePath);
@@ -97,12 +52,13 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
       : workbook.getWorksheet();
     // Check if worksheet exists
     if (!worksheet) {
-      throw new ApiError(StatusCode.internalservererror, 'Worksheet not found');
+      throw new ApiError(
+        StatusCode.internalservererror,
+        'Worksheet not found.'
+      );
     }
 
     const records = [];
-    const existingEmails: string[] = [];
-    const existingPhones: string[] = [];
     const rows = [];
     worksheet.eachRow({ includeEmpty: false }, (row, rowNumber) => {
       if (rowNumber === 1) return; // Skip header row
@@ -158,23 +114,21 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
         if (recordExists) {
           throw new ApiError(
             StatusCode.badrequest,
-            `Record with this email or phone already exists. Check row number ${i + 2}`
+            `Record with this email or phone already exists. Check row number ${i + 2}.`
           );
         }
       } catch (error) {
         throw new ApiError(
           StatusCode.badrequest,
-          `Record with this email or phone already exists. Check line number ${i + 2}`
+          `Record with this email or phone already exists. Check row number ${i + 2}`
         );
       }
 
       try {
         const validatedPayload = recordsSchema.parse(payload);
-        if (validatedPayload.email) existingEmails.push(validatedPayload.email);
-        if (validatedPayload.phone) existingPhones.push(validatedPayload.phone);
         records.push(validatedPayload);
       } catch (error) {
-        const message = `${error?.errors[0]?.message}. Error occurred at row number: ${row.number}`;
+        const message = `${error?.errors[0]?.message}. Error occurred at row number: ${row.number}.`;
         throw new ApiError(StatusCode.internalservererror, message);
       }
     }

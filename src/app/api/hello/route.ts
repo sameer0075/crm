@@ -10,7 +10,7 @@ const HelloHandler = async () => {
       status: StatusCode.success,
     });
   } catch (err) {
-    throw new ApiError(StatusCode.badrequest, 'Some error');
+    throw new ApiError(StatusCode.badrequest, 'Some error.');
   }
 };
 

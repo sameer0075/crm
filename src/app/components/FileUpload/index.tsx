@@ -8,6 +8,7 @@ interface FileUploadInterface {
   handleOpen: () => void;
   handleFile: () => void;
   handleSubmit: () => void;
+  extentionError?: string | null;
 }
 
 export default function FileUpload({
@@ -17,6 +18,7 @@ export default function FileUpload({
   handleOpen,
   handleFile,
   handleSubmit,
+  extentionError,
 }: FileUploadInterface) {
   useEffect(() => {
     // Add or remove the class on body depending on modal state
@@ -93,9 +95,12 @@ export default function FileUpload({
                 {file && file[0] ? (
                   <span className="font-bold">({file[0].name})</span>
                 ) : (
-                  'SVG, PNG, JPG or GIF (MAX. 800x400px)'
+                  'CSV, XLS, XLSX files are allowed'
                 )}
               </p>
+              <span className="text-red-600 text-[14px]">
+                {extentionError ? extentionError : ''}
+              </span>
             </div>
             <input
               onChange={handleFile}
@@ -108,7 +113,7 @@ export default function FileUpload({
         <div className="justify-center flex items-center p-4 md:p-5 border-t border-gray-200 rounded-b dark:border-gray-600">
           <Button
             handleClick={handleSubmit}
-            className="h-14 w-32 gap-4 bg-[#3673D4] m-2"
+            className={`h-14 w-32 gap-4 bg-[#3673D4] m-2 ${file === null ? 'opacity-60' : 'opacity-100'}`}
             text="Submit"
             type="button"
             loading={loading}

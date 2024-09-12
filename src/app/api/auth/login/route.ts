@@ -21,14 +21,14 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   });
 
   if (!user) {
-    throw new ApiError(StatusCode.unauthorized, 'Invalid email or password');
+    throw new ApiError(StatusCode.unauthorized, 'Invalid email or password.');
   }
 
   // Compare the provided password with the hashed password
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
-    throw new ApiError(StatusCode.unauthorized, 'Invalid email or password');
+    throw new ApiError(StatusCode.unauthorized, 'Invalid email or password.');
   }
 
   user = removeSensitiveFields(user, 'password');
@@ -38,7 +38,7 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   if (!jwtSecret) {
     throw new ApiError(
       StatusCode.internalservererror,
-      'JWT_SECRET is not defined'
+      'JWT_SECRET is not defined.'
     );
   }
 

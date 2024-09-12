@@ -37,7 +37,7 @@ const addRecordHandler = async (req: NextRequest): Promise<NextResponse> => {
     // If the record already exists, throw a bad request error
     throw new ApiError(
       StatusCode.badrequest,
-      'Record with this email or phone already exists'
+      'Record with this email or phone already exists.'
     );
   }
 
