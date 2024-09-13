@@ -1,7 +1,7 @@
 import React, { ChangeEvent, useState } from 'react';
-import TextArea from '../TextArea';
-import Select from '../Select';
-import Button from '../Button';
+import TextArea from '../../TextArea';
+import Select from '../../Select';
+import Button from '../../Button';
 
 const Lead = () => {
   const [comment, setComment] = useState<string>('');
