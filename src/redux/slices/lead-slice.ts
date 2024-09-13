@@ -30,14 +30,17 @@ interface RecordsInterface {
 const initialState = {
   isLoading: <boolean>false,
   data: <RecordsInterface[]>null,
+  count: <number>0,
 };
 
 export const getLeads = createAsyncThunk(
   'leads/list',
-  async (type: string, thunkAPI) => {
+  async (data: { type: string; page: number; pageSize: number }, thunkAPI) => {
     try {
-      const url = `${LeadEndpoints.leadsList(type)}`;
-      const resp = await api.get(`${url}`);
+      const url = `${LeadEndpoints.leadsList(data.type)}`;
+      const resp = await api.get(
+        `${url}?page=${data.page}&pageSize=${data.pageSize}`
+      );
       return resp;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -70,6 +73,7 @@ const leadsSlice = createSlice({
       .addCase(getLeads.fulfilled, (state, action) => {
         state.isLoading = false;
         state.data = action.payload.data;
+        state.count = action.payload.totalCount;
       })
       .addCase(
         getLeads.rejected,
@@ -91,6 +95,7 @@ const leadsSlice = createSlice({
       .addCase(bulkUpload.fulfilled, (state, action) => {
         state.isLoading = false;
         state.data = action.payload.data;
+        state.count = action.payload.data?.length;
         toast.info(action.payload.message);
       })
       .addCase(

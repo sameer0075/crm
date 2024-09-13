@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../components/Button';
@@ -10,6 +10,7 @@ import { bulkUpload, getLeads } from '@/redux/slices/lead-slice';
 const Leads = () => {
   const loading = useSelector((state) => state.leads.isLoading);
   const data = useSelector((state) => state.leads.data);
+  const count = useSelector((state) => state.leads.count);
   const dispatch = useDispatch<AppDispatch>();
   const [openFileUpload, setFileUpload] = useState(false);
   const [file, setFile] = useState(null);
@@ -60,9 +61,14 @@ const Leads = () => {
     });
   };
 
-  useEffect(() => {
-    dispatch(getLeads('LEAD'));
-  }, []);
+  const getList = (page: number, pageSize: number) => {
+    const payload = {
+      type: 'LEAD',
+      page,
+      pageSize,
+    };
+    dispatch(getLeads(payload));
+  };
 
   return (
     <div className="w-full">
@@ -102,7 +108,14 @@ const Leads = () => {
       </div>
 
       <div className="m-8">
-        <Table labels={LeadLabels} data={data} title="New Leads" />
+        <Table
+          labels={LeadLabels}
+          data={data}
+          title="New Leads"
+          totalRecords={count}
+          loading={loading}
+          handleApiCall={getList}
+        />
       </div>
     </div>
   );

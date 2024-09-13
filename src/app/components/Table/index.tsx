@@ -1,6 +1,7 @@
 'use client';
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { DataTable } from 'primereact/datatable';
+import { PaginationState } from 'primereact/paginator'; // Import PaginationState for type safety
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
 import moment from 'moment';
@@ -13,6 +14,9 @@ interface TableInterface {
   data: T[];
   title: string;
   rows?: number;
+  totalRecords?: number;
+  loading?: boolean;
+  handleApiCall?: () => void;
 }
 
 interface LabelsInterface {
@@ -33,8 +37,16 @@ export default function Table({
   labels,
   data,
   title,
-  rows = 5,
+  totalRecords = 0,
+  loading = false,
+  handleApiCall,
 }: TableInterface) {
+  const [pagination, setPagination] = useState({
+    first: 0,
+    rows: 5, // Default rows per page
+    page: 1,
+  });
+
   const paginatorLeft = (
     <Button
       type="button"
@@ -76,6 +88,38 @@ export default function Table({
     });
   }, [data]);
 
+  const onPageChange = (event: PaginationState) => {
+    setPagination((prev) => ({
+      ...prev,
+      first: event.first,
+      rows: event.rows,
+      page: Math.floor(event.first / event.rows), // Calculating page number
+    }));
+  };
+
+  const onRowsPerPageChange = (event) => {
+    setPagination((prev) => ({
+      ...prev,
+      first: event.first,
+      rows: event.rows,
+      page: 1,
+    }));
+  };
+
+  useEffect(() => {
+    if (handleApiCall)
+      handleApiCall(
+        pagination.page == 0 ? 1 : pagination.page,
+        pagination.rows
+      );
+    if (pagination.page == 0) {
+      setPagination((prev) => ({
+        ...prev,
+        page: 1,
+      }));
+    }
+  }, [pagination]);
+
   return (
     <div className="table-wrapper">
       <h1 className="text-[22px] font-outfit font-bold leading-[24px] w-full bg-white mb-4 p-4">
@@ -83,17 +127,24 @@ export default function Table({
       </h1>
       <div className="table-container">
         <DataTable
+          lazy
           emptyMessage={<EmptyData />}
           scrollable
           scrollHeight="300px"
           value={processedData}
           paginator
-          rows={rows}
+          rows={pagination.rows}
           rowsPerPageOptions={[5, 10, 25, 50]}
           tableStyle={{ minWidth: '100%' }} // Adjusted to fit within the container
           paginatorTemplate="RowsPerPageDropdown FirstPageLink PrevPageLink CurrentPageReport NextPageLink LastPageLink"
-          currentPageReportTemplate="{first} to {last} of {totalRecords}"
+          currentPageReportTemplate={`${pagination.page} to ${pagination.page * pagination.rows + 1} of ${totalRecords}`}
+          loading={loading}
           paginatorRight={paginatorLeft}
+          totalRecords={totalRecords}
+          first={pagination.page * pagination.rows}
+          onChange={onPageChange}
+          onPage={onPageChange}
+          onRowsPerPageChange={onRowsPerPageChange}
         >
           <Column
             header={
