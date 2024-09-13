@@ -49,7 +49,7 @@ export default function Header() {
     <div>
       <header className="sticky top-0 z-50 w-[100vw] border-b border-border/40 bg-white">
         <div className="container flex h-14 max-w-screen-2xl items-center justify-between mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-4 absolute left-[30px]">
             <a className="flex items-center space-x-2" href="/">
               <img
                 src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/NovatoreLogo.jpg`}
@@ -58,7 +58,7 @@ export default function Header() {
               />
             </a>
           </div>
-          <div className="flex items-center space-x-2 sm:space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4 absolute right-[50px]">
             <div className="relative hidden md:block w-[200px] sm:w-[306px]">
               <Input
                 id="search"

@@ -7,10 +7,11 @@ import { ToastContainer } from 'react-toastify';
 import Header from './components/Header/index';
 export default function Home() {
   const pathname = window.location.pathname;
+  const token = sessionStorage.getItem('token');
   return (
     <div>
       <ToastContainer />
-      {pathname != '/' && <Header />}
+      {pathname != '/' && token && <Header />}
       <Provider store={store}>
         <Auth />
       </Provider>

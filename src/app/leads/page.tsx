@@ -4,11 +4,11 @@ import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../components/Button';
-import { LeadLabels, LeadMockData } from '../components/mockdata/leads';
+import { LeadLabels } from '../components/mockdata/leads';
 import Table from '../components/Table';
 import FileUpload from '../components/FileUpload';
 import { bulkUpload, getLeads } from '@/redux/slices/lead-slice';
-import Lead from "../components/Lead"
+import Lead from '../components/Lead';
 const Leads = () => {
   const router = useRouter();
   const loading = useSelector((state) => state.leads.isLoading);
@@ -17,31 +17,57 @@ const Leads = () => {
   const [leads, setLeads] = useState([]);
   const [openFileUpload, setFileUpload] = useState(false);
   const [file, setFile] = useState(null);
-
+  const [extentionError, setExtentionError] = useState(null);
+  console.log(leads);
   const handleFileUploadModal = () => {
     const value = !openFileUpload;
     if (value === false) {
       setFile(null);
+      setExtentionError(null);
     }
     setFileUpload(value);
   };
 
+  const fileHandling = (fileData) => {
+    const allowedExtensions = ['csv', 'xls', 'xlsx'];
+    const files = Array.from(fileData);
+
+    const disallowedFiles = files.filter((info: File) => {
+      const fileExtension = info.name.split('.').pop().toLowerCase();
+      return !allowedExtensions.includes(fileExtension);
+    });
+
+    if (disallowedFiles.length > 0) {
+      setExtentionError(
+        'Invalid file type. Only CSV and Excel files are allowed.'
+      );
+      return false;
+    } else {
+      setExtentionError(null);
+      return true;
+    }
+  };
+
   const handleFile = (e) => {
-    setFile(e.target.files);
+    const validFile = fileHandling(e.target.files);
+    if (validFile) {
+      setFile(e.target.files);
+    } else {
+      setFile(null);
+    }
   };
 
   const handleAthentication = () => {
     const token = sessionStorage.getItem('token');
-    dispatch(getLeads('LEAD'));
-    // if (!token) {
-    //   router.push('/');
-    // } else {
-      
-    // }
+    console.log('token', token);
+    if (!token) {
+      router.push('/');
+    } else {
+      dispatch(getLeads('LEAD'));
+    }
   };
 
   useEffect(() => {
-    console.log('data', leads);
     setLeads(data);
   }, [data]);
 
@@ -83,21 +109,18 @@ const Leads = () => {
               handleFile={handleFile}
               handleSubmit={handleSubmit}
               file={file}
+              extentionError={extentionError}
             />
           )}
         </div>
       </div>
-          <div>
-            <Lead/>
-          </div>
-      {/* <div className="m-8">
-        <Table
-          labels={LeadLabels}
-          data={LeadMockData}
-          title="Follow Up Leads"
-        />
-      </div> */}
 
+      <div className="m-8">
+        <Table labels={LeadLabels} data={[]} title="Follow Up Leads" />
+      </div>
+      {/* <div>
+            <Lead/>
+          </div> */}
       {/* <div className="m-8">
         <Table labels={LeadLabels} data={data} title="New Leads" />
       </div> */}

@@ -1,8 +1,9 @@
 'use client';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { DataTable } from 'primereact/datatable';
 import { Column } from 'primereact/column';
 import { Button } from 'primereact/button';
+import moment from 'moment';
 import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import './table.css';
@@ -43,6 +44,38 @@ export default function Table({
     />
   );
 
+  const processedData = useMemo(() => {
+    return data?.map((item) => {
+      const { lead_source, updatedAt, ...rest } = item;
+      const processedItem = Object.fromEntries(
+        Object.entries(rest).map(([key, value]) => [key, value || 'N/A'])
+      );
+      return {
+        ...processedItem,
+        lead_source,
+        action: (
+          <div className="flex">
+            <img
+              className="cursor-pointer mr-2"
+              src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/phone.png`}
+            />
+            <img
+              className="cursor-pointer"
+              src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/email.png`}
+            />
+          </div>
+        ),
+        updatedAt: moment(updatedAt).format('DD/MM/YYYY'),
+        view: (
+          <img
+            className="cursor-pointer ml-1"
+            src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/detail.png`}
+          />
+        ),
+      };
+    });
+  }, [data]);
+
   return (
     <div className="table-wrapper">
       <h1 className="text-[22px] font-outfit font-bold leading-[24px] w-full bg-white mb-4 p-4">
@@ -53,7 +86,7 @@ export default function Table({
           emptyMessage={<EmptyData />}
           scrollable
           scrollHeight="300px"
-          value={data}
+          value={processedData}
           paginator
           rows={rows}
           rowsPerPageOptions={[5, 10, 25, 50]}
@@ -62,15 +95,33 @@ export default function Table({
           currentPageReportTemplate="{first} to {last} of {totalRecords}"
           paginatorRight={paginatorLeft}
         >
-          {labels.map((label: LabelsInterface, index: number) => (
-            <Column
-              key={index}
-              field={label.label}
-              header={label.header}
-              sortable={label.sortable}
-              style={{ width: 'auto' }}
-            />
-          ))}
+          <Column
+            header={
+              <input
+                type="checkbox"
+                className="border-gray-600 border-[1px]"
+                onChange={() => {
+                  /* Handle checkbox change */
+                }}
+              />
+            }
+            // access data using rowData
+            body={() => (
+              <input type="checkbox" className="border-gray-600 border-[1px]" />
+            )} // Adjust body if you need per-row checkboxes
+          />
+
+          {labels.map((label: LabelsInterface, index: number) => {
+            return (
+              <Column
+                key={index}
+                field={label.label ?? 'N/A'}
+                header={label.header}
+                sortable={label.sortable}
+                className="max-w-[200px] min-w-[200px] w-auto"
+              />
+            );
+          })}
         </DataTable>
       </div>
     </div>

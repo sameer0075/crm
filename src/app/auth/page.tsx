@@ -2,6 +2,7 @@
 import React, { ChangeEvent, useState, useEffect } from 'react';
 import { EyeIcon, EyeOffIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import _ from 'lodash';
 
 import Button from '../components/Button';
 import Input from '../components/Input';
@@ -44,6 +45,14 @@ export default function Auth() {
     handleAthentication();
   }, []);
 
+  const validateEmail = (email: string | undefined) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
+  };
+
   /**
    * Handles changes to the form data.
    *
@@ -55,8 +64,13 @@ export default function Auth() {
       ...prevData,
       [name]: value,
     }));
-
-    const validationValue = value.length > 0 ? `` : `${name} is required`;
+    console.log('email', name);
+    const validationValue =
+      value.length > 0
+        ? name === 'email' && !validateEmail(value)
+          ? 'Invalid email!'
+          : ``
+        : `${name} is required`;
     setErrors((prevData: FormData) => ({
       ...prevData,
       [name]: validationValue,
@@ -72,6 +86,11 @@ export default function Auth() {
     if (!formData.email) {
       newErrors.email = 'email is required';
     }
+
+    if (formData.email && !validateEmail(formData.email)) {
+      newErrors.email = 'Invalid Email!';
+    }
+
     setErrors(newErrors);
     return newErrors.email === '' && newErrors.password === '';
   };
@@ -130,7 +149,9 @@ export default function Auth() {
                 onKeyPress={handleEnterPress}
               />
               {errors.email && (
-                <p className="text-red-500 text-sm">{errors.email}</p>
+                <p className="text-red-500 text-sm">
+                  {_.startCase(_.toLower(errors.email))}
+                </p>
               )}
             </div>
 
@@ -165,7 +186,9 @@ export default function Auth() {
                   )}
                 </button>
                 {errors.password && (
-                  <p className="text-red-500 text-sm">{errors.password}</p>
+                  <p className="text-red-500 text-sm">
+                    {_.startCase(_.toLower(errors.password))}
+                  </p>
                 )}
               </div>
             </div>
