@@ -1,6 +1,5 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../components/Button';
@@ -9,15 +8,12 @@ import Table from '../components/Table';
 import FileUpload from '../components/FileUpload';
 import { bulkUpload, getLeads } from '@/redux/slices/lead-slice';
 const Leads = () => {
-  const router = useRouter();
   const loading = useSelector((state) => state.leads.isLoading);
   const data = useSelector((state) => state.leads.data);
   const dispatch = useDispatch<AppDispatch>();
-  const [leads, setLeads] = useState([]);
   const [openFileUpload, setFileUpload] = useState(false);
   const [file, setFile] = useState(null);
   const [extentionError, setExtentionError] = useState(null);
-  console.log(leads);
   const handleFileUploadModal = () => {
     const value = !openFileUpload;
     if (value === false) {
@@ -56,16 +52,6 @@ const Leads = () => {
     }
   };
 
-  const handleAthentication = () => {
-    const token = sessionStorage.getItem('token');
-    console.log('token', token);
-    if (!token) {
-      router.push('/');
-    } else {
-      dispatch(getLeads('LEAD'));
-    }
-  };
-
   const handleSubmit = () => {
     const formData = new FormData();
     formData.append('file', file[0]);
@@ -75,11 +61,7 @@ const Leads = () => {
   };
 
   useEffect(() => {
-    setLeads(data);
-  }, [data]);
-
-  useEffect(() => {
-    handleAthentication();
+    dispatch(getLeads('LEAD'));
   }, []);
 
   return (

@@ -15,7 +15,6 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();
   const { email, password } = loginSchema.parse(body);
 
-  // Find the user by email
   let user = await prisma.user.findFirst({
     where: { email },
     include: {
@@ -31,16 +30,15 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
     throw new ApiError(StatusCode.unauthorized, 'Invalid email or password.');
   }
 
-  // Compare the provided password with the hashed password
   const isPasswordValid = await bcrypt.compare(password, user.password);
 
   if (!isPasswordValid) {
     throw new ApiError(StatusCode.unauthorized, 'Invalid email or password.');
   }
 
+  // Remove sensitive fields
   user = removeSensitiveFields(user, 'password');
 
-  /// Ensure JWT_SECRET is defined
   const jwtSecret = process.env.JWT_SECRET;
   if (!jwtSecret) {
     throw new ApiError(
@@ -49,7 +47,6 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
     );
   }
 
-  // Generate and return a JWT token
   const token = jwt.sign({ id: user.id, role: user?.role?.key }, jwtSecret, {
     expiresIn: '24h',
   });

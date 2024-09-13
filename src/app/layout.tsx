@@ -1,6 +1,7 @@
 'use client';
+import { useEffect } from 'react';
 import localFont from 'next/font/local';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { PrimeReactProvider } from 'primereact/api';
 
 import Header from './components/Header/index';
@@ -23,6 +24,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleAthentication = () => {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      router.push('/');
+    }
+  };
+
+  useEffect(() => {
+    handleAthentication();
+  }, []);
+
   return (
     <html lang="en">
       <body

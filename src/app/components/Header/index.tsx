@@ -1,12 +1,14 @@
 'use client';
 import { useState, ChangeEvent, useRef, useEffect } from 'react';
-import { UserCircle, Search } from 'lucide-react'; // Importing the Search icon
+import { UserCircle, Search } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import Input from '../Input';
 import Subheader from '../SubHeader';
 
 export default function Header() {
   const [search, setSearch] = useState('');
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
   const dropdownRef = useRef(null);
   const buttonRef = useRef(null);
 
@@ -32,7 +34,7 @@ export default function Header() {
 
   const handleLogout = () => {
     sessionStorage.removeItem('token');
-    window.location.href = '/';
+    router.push('/');
   };
 
   useEffect(() => {
