@@ -18,6 +18,13 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   // Find the user by email
   let user = await prisma.user.findFirst({
     where: { email },
+    include: {
+      role: {
+        select: {
+          key: true,
+        },
+      },
+    },
   });
 
   if (!user) {
@@ -43,7 +50,9 @@ const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   }
 
   // Generate and return a JWT token
-  const token = jwt.sign({ id: user.id }, jwtSecret, { expiresIn: '24h' });
+  const token = jwt.sign({ id: user.id, role: user?.role?.key }, jwtSecret, {
+    expiresIn: '24h',
+  });
 
   return NextResponse.json(
     {

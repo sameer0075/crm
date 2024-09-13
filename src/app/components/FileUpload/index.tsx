@@ -21,14 +21,12 @@ export default function FileUpload({
   extentionError,
 }: FileUploadInterface) {
   useEffect(() => {
-    // Add or remove the class on body depending on modal state
     if (open) {
       document.body.style.overflow = 'hidden';
     } else {
       document.body.style.overflow = 'auto';
     }
 
-    // Clean up on component unmount
     return () => {
       document.body.style.overflow = 'auto';
     };

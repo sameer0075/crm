@@ -26,16 +26,6 @@ export default function Header() {
     }
   };
 
-  useEffect(() => {
-    // Add event listener for clicks outside
-    document.addEventListener('mousedown', handleClickOutside);
-
-    // Clean up event listener on component unmount
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
@@ -44,6 +34,14 @@ export default function Header() {
     sessionStorage.removeItem('token');
     window.location.href = '/';
   };
+
+  useEffect(() => {
+    document.addEventListener('mousedown', handleClickOutside);
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   return (
     <div>
