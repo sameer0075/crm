@@ -22,30 +22,10 @@ const errorHanlderEnum = (req: NextRequest, error?: unknown) => {
 
   // Create the error payload
   const errorPayload = {
-    /**
-     * A boolean to indicate if there was an error
-     * @type {boolean}
-     */
     error: true,
-    /**
-     * The HTTP status code of the error
-     * @type {number}
-     */
     status: status,
-    /**
-     * The error message
-     * @type {string}
-     */
     message: message,
-    /**
-     * The endpoint that the error occurred on
-     * @type {string}
-     */
     endpoint: req.url,
-    /**
-     * The timestamp of the error
-     * @type {string}
-     */
     timeStamp: new Date().toISOString(),
   };
 
@@ -59,6 +39,12 @@ const enum StatusCode {
   internalservererror = 500,
 }
 
+enum RoleEnums {
+  ADMIN = 'admin',
+  SDR = 'sdr',
+  MANAGER = 'manager',
+}
+
 const RecordsEnum = ['LEAD', 'OPPORTUNITY', 'APPOINTMENT', 'DEAL'];
 
-export { errorHanlderEnum, StatusCode, RecordsEnum };
+export { errorHanlderEnum, StatusCode, RecordsEnum, RoleEnums };

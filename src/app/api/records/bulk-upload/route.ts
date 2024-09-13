@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import { ApiError } from 'next/dist/server/api-utils';
 import { globalErrorHandler } from '@/lib/error-handling/error-handler';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';
-import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
 import { StatusCode } from '@/utils/enums';
 import { join } from 'path';
 import { Workbook } from 'exceljs';
@@ -15,6 +14,7 @@ import {
   isValidFile,
   validateEmail,
 } from '@/utils/helper-functions';
+import { RoleGuard } from '@/lib/middleware/role-guard';
 const prisma = new PrismaClient();
 
 export const config = {
@@ -25,7 +25,6 @@ export const config = {
 
 const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
   try {
-    // Parse the form data
     const formData = await req.formData();
     const file = formData.get('file') as File;
     if (!file || !(file instanceof File)) {
@@ -41,7 +40,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
     }
 
     const tempDir = join(process.cwd(), 'temp');
-    const tempFilePath = join(tempDir, 'uploaded-file.xlsx'); // Assuming the file is Excel, not CSV
+    const tempFilePath = join(tempDir, 'uploaded-file.xlsx');
 
     await fileHandling(tempDir, tempFilePath, file);
 
@@ -50,7 +49,6 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
     const worksheet = workbook.getWorksheet(1)
       ? workbook.getWorksheet(1)
       : workbook.getWorksheet();
-    // Check if worksheet exists
     if (!worksheet) {
       throw new ApiError(
         StatusCode.internalservererror,
@@ -146,7 +144,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
     const insertedRecords = await prisma.records.findMany({
       where: {
         email: {
-          in: records.map((record) => record.email), // Adjust to match your unique field
+          in: records.map((record) => record.email),
         },
       },
     });
@@ -167,7 +165,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
 };
 // Compose and apply middlewares
 const composedMiddleware = composeMiddlewares(
-  jwtMiddleware /*, otherMiddlewares */
+  RoleGuard /*, otherMiddlewares */
 );
 
 export const POST = async (req: NextRequest) => {

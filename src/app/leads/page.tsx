@@ -8,7 +8,6 @@ import { LeadLabels } from '../components/mockdata/leads';
 import Table from '../components/Table';
 import FileUpload from '../components/FileUpload';
 import { bulkUpload, getLeads } from '@/redux/slices/lead-slice';
-import Lead from '../components/Lead/comments';
 const Leads = () => {
   const router = useRouter();
   const loading = useSelector((state) => state.leads.isLoading);
@@ -67,10 +66,6 @@ const Leads = () => {
     }
   };
 
-  useEffect(() => {
-    setLeads(data);
-  }, [data]);
-
   const handleSubmit = () => {
     const formData = new FormData();
     formData.append('file', file[0]);
@@ -80,8 +75,13 @@ const Leads = () => {
   };
 
   useEffect(() => {
+    setLeads(data);
+  }, [data]);
+
+  useEffect(() => {
     handleAthentication();
   }, []);
+
   return (
     <div className="w-full">
       <div className="flex m-10">
@@ -118,12 +118,10 @@ const Leads = () => {
       <div className="m-8">
         <Table labels={LeadLabels} data={[]} title="Follow Up Leads" />
       </div>
-      {/* <div>
-            <Lead/>
-          </div> */}
-      {/* <div className="m-8">
+
+      <div className="m-8">
         <Table labels={LeadLabels} data={data} title="New Leads" />
-      </div> */}
+      </div>
     </div>
   );
 };

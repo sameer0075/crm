@@ -30,6 +30,7 @@ model role {
   id          String  @id @default(uuid()) @db.Uuid
   name        String
   description String?
+  key         String?
   users       user[]
 }
 
