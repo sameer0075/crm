@@ -41,10 +41,6 @@ export default function Auth() {
     }
   };
 
-  useEffect(() => {
-    handleAthentication();
-  }, []);
-
   const validateEmail = (email: string | undefined) => {
     return String(email)
       .toLowerCase()
@@ -64,7 +60,6 @@ export default function Auth() {
       ...prevData,
       [name]: value,
     }));
-    console.log('email', name);
     const validationValue =
       value.length > 0
         ? name === 'email' && !validateEmail(value)
@@ -101,15 +96,23 @@ export default function Auth() {
   const handleClick = () => {
     const validation = validateForm();
     if (validation) {
-      dispatch(login(formData));
+      dispatch(login(formData)).then(() => {
+        setTimeout(() => {
+          router.push('/leads');
+        }, 1500);
+      });
     }
   };
 
-  const handleEnterPress = () => {
+  const handleEnterPress = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
       handleClick();
     }
   };
+
+  useEffect(() => {
+    handleAthentication();
+  }, []);
 
   return (
     <div className="flex flex-col min-h-screen md:flex-row max-h-[100vh]">

@@ -22,14 +22,11 @@ const deleteRecordHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();
   const payload = recordsSchema.parse(body);
 
-  // Get the record id from the URL
   const id = req.nextUrl.pathname.split('/').pop();
   if (!id) {
-    // If the record id is missing, throw a bad request error
     throw new ApiError(StatusCode.badrequest, 'Record id is required!');
   }
 
-  // Check if the record exists
   const recordExists = await prisma.records.findFirst({
     where: {
       type: payload.type,
@@ -38,7 +35,6 @@ const deleteRecordHandler = async (req: NextRequest): Promise<NextResponse> => {
   });
 
   if (!recordExists) {
-    // If the record does not exist, throw a bad request error
     throw new ApiError(
       StatusCode.badrequest,
       'Record with this type does not exists!'
@@ -55,7 +51,6 @@ const deleteRecordHandler = async (req: NextRequest): Promise<NextResponse> => {
     },
   });
 
-  // Return the response
   return NextResponse.json(
     {
       success: true,

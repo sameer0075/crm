@@ -5,6 +5,12 @@ import { StatusCode } from '@/utils/enums';
 
 const secretKey = process.env.JWT_SECRET || 'NO_SECRET';
 
+declare module 'next/server' {
+  interface NextRequest {
+    userId: string;
+  }
+}
+
 export const jwtMiddleware = async (
   req: NextRequest
 ): Promise<NextResponse | void> => {
@@ -19,7 +25,9 @@ export const jwtMiddleware = async (
   const token = authHeader.split(' ')[1];
   try {
     // Verify the JWT token
-    jwt.verify(token, secretKey);
+    const decoded = jwt.verify(token, secretKey) as jwt.JwtPayload;
+    const userId = decoded.id;
+    req.userId = userId;
   } catch (error) {
     return new NextResponse(
       JSON.stringify({ success: false, message: 'Unauthorized' }),

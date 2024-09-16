@@ -20,7 +20,6 @@ const signupHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();
   const { name, email, password, roleId } = signupSchema.parse(body);
 
-  // Check if the roleId exists in the role table
   const roleExists = await prisma.role.findFirst({
     where: { id: roleId },
   });
@@ -29,7 +28,6 @@ const signupHandler = async (req: NextRequest): Promise<NextResponse> => {
     throw new ApiError(StatusCode.badrequest, 'Role does not exists!');
   }
 
-  // Check if the user already exists
   const existingUser = await prisma.user.findFirst({
     where: { email },
   });
@@ -38,13 +36,8 @@ const signupHandler = async (req: NextRequest): Promise<NextResponse> => {
     throw new ApiError(StatusCode.badrequest, 'User already exists!');
   }
 
-  // Hash the password if provided
-  let hashedPassword = '';
-  if (password) {
-    hashedPassword = await bcrypt.hash(password, 10);
-  }
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Create the new user
   let newUser = await prisma.user.create({
     data: {
       name,

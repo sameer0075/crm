@@ -31,7 +31,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
       throw new ApiError(StatusCode.badrequest, 'File is required.');
     }
     const validFile = !isValidFile(file);
-
+    // Validating File
     if (validFile) {
       throw new ApiError(
         StatusCode.badrequest,
@@ -41,7 +41,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
 
     const tempDir = join(process.cwd(), 'temp');
     const tempFilePath = join(tempDir, 'uploaded-file.xlsx');
-
+    // Create Path if not present
     await fileHandling(tempDir, tempFilePath, file);
 
     const workbook = new Workbook();

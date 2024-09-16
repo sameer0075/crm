@@ -11,7 +11,6 @@ const Lead = () => {
    * @param {ChangeEvent<HTMLInputElement>} e - The change event.
    */
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    console.log('e', e);
     setComment(e.target.value);
   };
   const handleSubmit = () => {};
