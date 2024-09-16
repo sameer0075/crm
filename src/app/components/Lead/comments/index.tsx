@@ -17,7 +17,7 @@ const Lead = () => {
   const handleSubmit = () => {};
   return (
     <div className="w-full flex justify-center px-4 sm:px-0">
-      <div className="w-full sm:w-[500px] md:w-[600px] p-4 sm:p-6 lg:w-[670px] flex-shrink-0 rounded-[8px] bg-gradient-to-tr from-white via-transparent to-transparent shadow-[0px_0px_18px_rgba(218,222,232,0.5)]">
+      <div className="w-full sm:w-[500px] md:w-[600px] p-4 sm:p-6 lg:w-[670px] flex-shrink-0 ">
         <h2 className="text-[#111] font-medium text-base font-outfit">
           Status: Leads
         </h2>
