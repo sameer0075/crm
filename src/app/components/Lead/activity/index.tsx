@@ -1,14 +1,6 @@
 'use client';
 import React from 'react';
-import { IoMail } from 'react-icons/io5';
-import { IoMdCall } from 'react-icons/io';
-
-const steps = [
-  { icon: <IoMdCall />, label: 'Call' },
-  { icon: <IoMail />, label: 'Email' },
-  { icon: <IoMdCall />, label: 'Call' },
-  { icon: <IoMdCall />, label: 'Call' },
-];
+import { StepsMockData } from '../../mockdata/activitysteps';
 
 const CallActivity = () => (
   <section>
@@ -17,11 +9,11 @@ const CallActivity = () => (
         Activity
       </h2>
       <div className="flex flex-col relative">
-        {steps.map((step, index) => (
+        {StepsMockData.map((step, index) => (
           <div key={index} className="flex items-center mb-6 relative ">
             <div
               className={`flex items-center justify-center w-[30px] h-[30px] rounded-full text-white text-center mr-4 
-                            ${step.icon.type === IoMail ? 'bg-[#3673D4]' : 'bg-[#72D436]'}`}
+                ${step.label === 'Email' ? 'bg-[#3673D4]' : 'bg-[#72D436]'}`}
             >
               {step.icon}
             </div>
@@ -30,11 +22,11 @@ const CallActivity = () => (
                 {step.label}
               </h1>
               <div className="flex justify-between items-center text-black text-[12px]">
-                <p>You logged a call</p>
+                <p>You logged a {step.label.toLowerCase()}</p>
                 <p>15 min 30 sec</p>
               </div>
             </div>
-            {index < steps.length - 1 && (
+            {index < StepsMockData.length - 1 && (
               <div className="absolute left-3 top-12 w-[2px] h-[70%] bg-[#72D436]" />
             )}
           </div>
