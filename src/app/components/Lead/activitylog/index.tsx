@@ -5,7 +5,9 @@ import { logData } from '../../mockdata/activitylog';
 const ActivityLog = () => (
   <section>
     <div className="rounded-lg bg-gradient-to-br from-white via-white to-transparent shadow-lg max-h-[500px] p-6">
-      <h2 className="text-lg font-semibold text-black pb-[12px]">Activity Log</h2>
+      <h2 className="text-lg font-semibold text-black pb-[12px]">
+        Activity Log
+      </h2>
       <div className="flex flex-col relative">
         {logData.map((log, index) => (
           <div
