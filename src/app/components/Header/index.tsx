@@ -46,7 +46,7 @@ export default function Header() {
   }, []);
 
   return (
-    <div>
+    <div className='overflow-x-hidden'>
       <header className="sticky top-0 z-50 w-[100vw] border-b border-border/40 bg-white">
         <div className="container flex h-14 max-w-screen-2xl items-center justify-between mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center space-x-4 absolute left-[30px]">
