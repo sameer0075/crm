@@ -31,6 +31,7 @@ const initialState = {
   isLoading: <boolean>false,
   data: <RecordsInterface[]>null,
   count: <number>0,
+  details: <RecordsInterface>null,
 };
 
 export const getLeads = createAsyncThunk(
@@ -41,6 +42,19 @@ export const getLeads = createAsyncThunk(
       const resp = await api.get(
         `${url}?page=${data.page}&pageSize=${data.pageSize}`
       );
+      return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const leadDetails = createAsyncThunk(
+  'leads/get',
+  async (data: { id: string }, thunkAPI) => {
+    try {
+      const url = `${LeadEndpoints.leadDetails(data.id)}`;
+      const resp = await api.get(url);
       return resp;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
@@ -111,6 +125,27 @@ const leadsSlice = createSlice({
             }, 2000);
           }
           toast.error(action.payload.message);
+          state.isLoading = false;
+        }
+      )
+
+      .addCase(leadDetails.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(leadDetails.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.details = action.payload.data;
+      })
+      .addCase(
+        leadDetails.rejected,
+        (state, action: { payload: { message: string } }) => {
+          if (action?.payload?.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+            toast.error(action.payload.message);
+          }
           state.isLoading = false;
         }
       );

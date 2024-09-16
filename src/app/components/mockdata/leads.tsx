@@ -24,7 +24,11 @@ const LeadLabels = [
   {
     label: 'view',
     header: (
-      <img src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/options.png`} />
+      <div>
+        <img
+          src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/options.png`}
+        />
+      </div>
     ),
   },
 ];

@@ -17,6 +17,7 @@ interface TableInterface {
   totalRecords?: number;
   loading?: boolean;
   handleApiCall?: () => void;
+  handleView: () => void;
 }
 
 interface LabelsInterface {
@@ -40,6 +41,7 @@ export default function Table({
   totalRecords = 0,
   loading = false,
   handleApiCall,
+  handleView,
 }: TableInterface) {
   const [pagination, setPagination] = useState({
     first: 0,
@@ -79,10 +81,14 @@ export default function Table({
         ),
         updatedAt: moment(updatedAt).format('DD/MM/YYYY'),
         view: (
-          <img
+          <div
             className="cursor-pointer ml-1"
-            src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/detail.png`}
-          />
+            onClick={() => handleView(rest.id)}
+          >
+            <img
+              src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/detail.png`}
+            />
+          </div>
         ),
       };
     });
