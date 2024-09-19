@@ -13,7 +13,9 @@ const Lead = () => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
   };
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    window.open('openphone://dial?number=8002752273');
+  };
   return (
     <div className="w-full flex justify-center px-4 sm:px-0">
       <div className="w-full sm:w-[500px] md:w-[600px] p-4 sm:p-6 lg:w-[670px] flex-shrink-0 ">

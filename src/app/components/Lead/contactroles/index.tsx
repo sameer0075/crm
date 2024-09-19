@@ -9,7 +9,6 @@ interface ContactRolesInterface {
 }
 
 const ContactRoles = (data: ContactRolesInterface) => {
-  console.log('data', data);
   return (
     <div className="bg-white rounded-lg p-4 bg-gradient-to-br from-white via-white to-transparent shadow-lg">
       <h1 className="font-bold">Contact Roles</h1>

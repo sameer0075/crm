@@ -8,4 +8,8 @@ const LeadEndpoints = {
   bulkUpload: () => `/records/bulk-upload`,
 };
 
-export { AuthEndpoints, LeadEndpoints };
+const ActivityLogs = {
+  logsList: (id: string, type?: string) => `/logs/${id}?type=${type ?? ''}`,
+};
+
+export { AuthEndpoints, LeadEndpoints, ActivityLogs };

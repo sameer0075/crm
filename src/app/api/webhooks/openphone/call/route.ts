@@ -6,6 +6,29 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+function formatTimeDifference(date1, date2) {
+  // Convert the date strings to Date objects if they are not already
+  date1 = new Date(date1);
+  date2 = new Date(date2);
+
+  const msDifference = Math.abs(date2 - date1); // Difference in milliseconds
+  const totalSeconds = msDifference / 1000;
+
+  // Break down the total time difference
+  const hours = Math.floor(totalSeconds / 3600); // Get the number of hours
+  const minutes = Math.floor((totalSeconds % 3600) / 60); // Get the number of minutes
+  const seconds = (totalSeconds % 60).toFixed(1); // Get the remaining seconds (to 1 decimal point)
+
+  // Build the readable response
+  let response = '';
+
+  if (hours > 0) response += `${hours} hour${hours !== 1 ? 's' : ''} `;
+  if (minutes > 0) response += `${minutes} minute${minutes !== 1 ? 's' : ''} `;
+  if (seconds > 0) response += `${seconds} second${seconds !== 1 ? 's' : ''}`;
+
+  return response.trim();
+}
+
 const OpenPhoneHandler = async (req: NextRequest) => {
   const event = await req.json();
   console.log('event', event);
@@ -15,11 +38,16 @@ const OpenPhoneHandler = async (req: NextRequest) => {
         phone: event.data.object.to,
       },
     });
+    const differenceInSeconds = formatTimeDifference(
+      event.data.object.createdAt,
+      event.data.object.completedAt
+    );
     if (record) {
       const payload = {
         type: event.data.object.object,
         logType: 'LEAD',
         openPhoneType: event.type,
+        callDuration: String(differenceInSeconds),
         record: {
           connect: {
             id: record?.id,

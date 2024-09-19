@@ -12,11 +12,14 @@ import Novatore from '../components/Lead/novatore';
 import DetailLogs from '../components/Lead/details';
 import CallNow from '../components/Lead/callnow';
 import { leadDetails } from '@/redux/slices/lead-slice';
+import { getLogs, getPhoneLogs } from '@/redux/slices/logs-slice';
 
 const Page = () => {
   const [details, setDetails] = useState(null);
   const [contactRoles, setContactRoles] = useState(null);
   const data = useSelector((state) => state.leads.details);
+  const allLogs = useSelector((state) => state.logs.allLogs);
+  const phoneLogs = useSelector((state) => state.logs.phoneLogs);
   const dispatch = useDispatch<AppDispatch>();
 
   const params = useSearchParams();
@@ -24,11 +27,12 @@ const Page = () => {
 
   useEffect(() => {
     dispatch(leadDetails({ id }));
+    dispatch(getPhoneLogs({ id, type: 'call' }));
+    dispatch(getLogs({ id, type: 'all' }));
   }, []);
 
   useEffect(() => {
     if (data) {
-      console.log('details', details);
       const detailsPayload = [
         { state: 'State', value: data.state ?? 'N/A' },
         { state: 'Name', value: data.fullName ?? 'N/A' },
@@ -69,13 +73,13 @@ const Page = () => {
           {/* Second Column */}
           <div className="col-span-12 md:col-span-6 flex flex-col gap-4">
             <Stepper />
-            <CallActivity />
+            <CallActivity data={allLogs} />
           </div>
           {/* Third Column */}
           <div className="col-span-12 md:col-span-3 flex flex-col gap-4">
             <CallNow />
-            <CalendarLogs />
-            <ActivityLog />
+            <CalendarLogs data={phoneLogs} />
+            <ActivityLog data={allLogs} />
           </div>
         </div>
       </div>

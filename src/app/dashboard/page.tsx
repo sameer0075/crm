@@ -3,7 +3,7 @@ import React from 'react';
 
 const Dashboard = () => {
   const handleClick = () => {
-    window.open('openphone://dial?number=4107934326');
+    window.open('openphone://dial?number=8002752273');
   };
   return <div onClick={handleClick}>Dashboard Page</div>;
 };

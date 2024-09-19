@@ -84,6 +84,7 @@ model activity_logs {
   openPhoneVersion    String?
   eventCreation       DateTime?
   messageCallId              String?
+  callDuration  String?
   from            String?
   to              String?
   direction       String?
