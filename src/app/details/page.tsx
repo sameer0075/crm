@@ -12,7 +12,11 @@ import Novatore from '../components/Lead/novatore';
 import DetailLogs from '../components/Lead/details';
 import CallNow from '../components/Lead/callnow';
 import { leadDetails } from '@/redux/slices/lead-slice';
-import { getLogs, getPhoneLogs } from '@/redux/slices/logs-slice';
+import {
+  getLogs,
+  getPhoneLogs,
+  getCommentLogs,
+} from '@/redux/slices/logs-slice';
 import { getComments } from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
 
@@ -34,7 +38,7 @@ const Page = () => {
       dispatch(getComments({ id }));
       dispatch(getPhoneLogs({ id, type: 'call' }));
       dispatch(getLogs({ id, type: 'all' }));
-      dispatch(getLogs({ id, type: 'comment' }));
+      dispatch(getCommentLogs({ id, type: 'comment' }));
     }
   }, []);
 

@@ -2,9 +2,12 @@
 import React from 'react';
 
 const CallNow = () => {
+  const handleClick = () => {
+    window.open('openphone://dial?number=8002752273');
+  };
   return (
     <div className="text-[16px] font-semibold rounded-lg bg-white p-4 flex justify-between items-center bg-gradient-to-br from-white via-transparent to-transparent shadow-lg shadow-gray-300">
-      <div className="flex items-center">
+      <div onClick={handleClick} className="flex items-center cursor-pointer">
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
