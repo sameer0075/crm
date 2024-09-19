@@ -2,13 +2,14 @@
 import React from 'react';
 import { DetailLogMockData } from '../../mockdata/detailmockdata';
 
-const DetailLogs = () => {
+const DetailLogs = ({ data }) => {
+  const details = data ?? DetailLogMockData;
   return (
     <div className="w-full rounded-lg bg-gradient-to-br from-white via-transparent to-transparent shadow-lg">
       <div className="p-4 h-full flex flex-col bg-white rounded-lg">
         <h2 className="text-lg font-semibold text-[#3673D4]">Details</h2>
 
-        {DetailLogMockData.map((log, index) => (
+        {details?.map((log, index) => (
           <div
             key={index}
             className="flex justify-between items-center border-b border-gray-200 py-[6px] text-[#000] text-[12px]"

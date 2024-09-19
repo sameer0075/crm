@@ -4,18 +4,18 @@ interface DetailLogInterface {
 }
 
 const DetailLogMockData: DetailLogInterface[] = [
-  { state: 'State', value: 'California' },
-  { state: 'Name', value: 'Harve' },
-  { state: 'Title', value: 'International Sales Director' },
-  { state: 'Email', value: 'herve@100percent.com' },
-  { state: 'Phone', value: '1 6104219074' },
-  { state: 'Mobile', value: '1 6104219074' },
-  { state: 'Website', value: 'www.biglifeinc.com' },
-  { state: 'Company', value: '100percent' },
-  { state: 'Industry', value: 'retail' },
-  { state: 'Company Linkedin', value: 'http://www.linkedin.com' },
-  { state: 'Country', value: 'United States' },
-  { state: 'City', value: 'San Diego' },
+  { state: 'State', value: 'N/A' },
+  { state: 'Name', value: 'N/A' },
+  { state: 'Title', value: 'N/A' },
+  { state: 'Email', value: 'N/A' },
+  { state: 'Phone', value: 'N/A' },
+  { state: 'Mobile', value: '1N/A' },
+  { state: 'Website', value: 'N/A' },
+  { state: 'Company', value: 'N/A' },
+  { state: 'Industry', value: 'N/A' },
+  { state: 'Company Linkedin', value: 'N/A' },
+  { state: 'Country', value: 'N/A' },
+  { state: 'City', value: 'N/A' },
 ];
 
 export { DetailLogMockData };

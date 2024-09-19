@@ -3,44 +3,43 @@ import { ApiError } from 'next/dist/server/api-utils';
 import { globalErrorHandler } from '@/lib/error-handling/error-handler';
 import { StatusCode } from '@/utils/enums';
 import { PrismaClient } from '@prisma/client';
-import {
-  CreateActivityLog,
-  CreateEmptyACtivityLog,
-} from '../helper-functions/common';
 
 const prisma = new PrismaClient();
 
 const OpenPhoneHandler = async (req: NextRequest) => {
+  const event = await req.json();
+  console.log('event', event);
   try {
-    const event = await req.json();
     const record = await prisma.records.findFirst({
       where: {
         phone: event.data.object.to,
       },
     });
-
     if (record) {
-      const log = await CreateActivityLog(req, event, record.id);
-      const openPhonePayload = {
+      const payload = {
+        type: event.data.object.object,
+        logType: 'LEAD',
+        openPhoneType: event.type,
+        record: {
+          connect: {
+            id: record?.id,
+          },
+        },
         openphoneId: event.id,
         openPhoneVersion: event.apiVersion,
         eventCreation: event.createdAt,
-        callId: event.data.object.id,
-        callFrom: event.data.object.from,
-        callTo: event.data.object.to,
-        callDirection: event.data.object.direction,
-        callStatus: event.data.object.status,
-        callUserId: event.data.object.userId,
-        callPhoneNumberId: event.data.object.phoneNumberId,
-        callConversationId: event.data.object.conversationId,
-        openPhoneJson: event,
-        logId: log.id,
+        messageCallId: event.data.object.id,
+        from: event.data.object.from,
+        to: event.data.object.to,
+        direction: event.data.object.direction,
+        status: event.data.object.status,
+        openPhoneUserId: event.data.object.userId,
+        phoneNumberId: event.data.object.phoneNumberId,
+        conversationId: event.data.object.conversationId,
+        eventPayload: JSON.stringify(event),
       };
 
-      await prisma.openphone_phone_log.create({
-        data: openPhonePayload,
-      });
-
+      await prisma.activity_logs.create({ data: payload });
       return NextResponse.json(
         {
           success: true,
@@ -49,12 +48,21 @@ const OpenPhoneHandler = async (req: NextRequest) => {
         { status: StatusCode.success }
       );
     } else {
-      const log = await CreateEmptyACtivityLog(event);
-      return NextResponse.json(log.notFoundText, {
-        status: StatusCode.success,
+      await prisma.failed_activity_logs.create({
+        data: {
+          failMessage: 'Record not found!',
+          openPhonePayload: JSON.stringify(event),
+        },
       });
+      throw new ApiError(StatusCode.badrequest, 'Record not found!');
     }
   } catch (error) {
+    await prisma.failed_activity_logs.create({
+      data: {
+        failMessage: JSON.stringify(error.message),
+        openPhonePayload: JSON.stringify(event),
+      },
+    });
     console.log('error---', error);
     throw new ApiError(StatusCode.badrequest, error.message);
   }

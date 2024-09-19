@@ -15,6 +15,7 @@ import { leadDetails } from '@/redux/slices/lead-slice';
 
 const Page = () => {
   const [details, setDetails] = useState(null);
+  const [contactRoles, setContactRoles] = useState(null);
   const data = useSelector((state) => state.leads.details);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -28,7 +29,30 @@ const Page = () => {
   useEffect(() => {
     if (data) {
       console.log('details', details);
-      setDetails(data);
+      const detailsPayload = [
+        { state: 'State', value: data.state ?? 'N/A' },
+        { state: 'Name', value: data.fullName ?? 'N/A' },
+        { state: 'Title', value: data.title ?? 'N/A' },
+        { state: 'Email', value: data.email ?? 'N/A' },
+        { state: 'Phone', value: data.phone ?? 'N/A' },
+        { state: 'Mobile', value: data.mobile ?? data.phone },
+        { state: 'Website', value: data.website ?? 'N/A' },
+        { state: 'Company', value: data.company ?? 'N/A' },
+        { state: 'Industry', value: data.industry ?? 'N/A' },
+        {
+          state: 'Company Linkedin',
+          value: data.company_linkedin_url ?? 'N/A',
+        },
+        { state: 'Country', value: data.country ?? 'N/A' },
+        { state: 'City', value: data.city ?? 'N/A' },
+      ];
+      setDetails(detailsPayload);
+      setContactRoles({
+        fullName: data.fullName,
+        title: data.title,
+        phone: data.phone,
+        email: data.email,
+      });
     }
   }, [data]);
 
@@ -39,8 +63,8 @@ const Page = () => {
           {/* First Column */}
           <div className="col-span-12 md:col-span-3 flex flex-col gap-4">
             <Novatore />
-            <ContactRoles />
-            <DetailLogs />
+            <ContactRoles data={contactRoles} />
+            <DetailLogs data={details} />
           </div>
           {/* Second Column */}
           <div className="col-span-12 md:col-span-6 flex flex-col gap-4">

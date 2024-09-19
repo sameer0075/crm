@@ -75,61 +75,32 @@ model records {
 
 model activity_logs {
   id                  String       @id @default(uuid()) @db.Uuid
-  type                String
+  type                String // email,phone,message,comment
+  openPhoneType       String
   logType             String
   recordId            String?       @db.Uuid
+  emailText String?
+  openphoneId         String?
+  openPhoneVersion    String?
+  eventCreation       DateTime?
+  messageCallId              String?
+  from            String?
+  to              String?
+  direction       String?
+  status          String?
+  openPhoneUserId          String?
+  phoneNumberId   String?
+  conversationId  String?
+  body    String? //for message type
+  media   Json?  // for message type
+  eventPayload  Json?
   record              records?       @relation(fields: [recordId], references: [id])
   notFoundText        String?
   createdAt           DateTime     @default(now()) @db.Timestamp(6)
-  emailLog            email_log[]
-  openPhoneLogs       openphone_phone_log[]
-  openMessageLogs     openphone_message_log[]
-
-  @@unique([recordId, logType])
-  @@index([type, recordId])
 }
 
-model email_log {
-  id        String   @id @default(uuid()) @db.Uuid
-  emailText String
-  logId String @db.Uuid
-  log    activity_logs   @relation(fields: [logId], references: [id])
-}
-
-model openphone_phone_log {
-  id                  String   @id @default(uuid()) @db.Uuid
-  openphoneId         String
-  openPhoneVersion    String
-  eventCreation       DateTime
-  callId              String
-  callFrom            String
-  callTo              String
-  callDirection       String
-  callStatus          String
-  callUserId          String
-  callPhoneNumberId   String
-  callConversationId  String
-  openPhoneJson       Json
-  logId String @db.Uuid
-  log    activity_logs   @relation(fields: [logId], references: [id])
-}
-
-model openphone_message_log {
-  id                  String   @id @default(uuid()) @db.Uuid
-  openphoneId         String
-  openPhoneVersion    String
-  eventCreation       DateTime
-  messageId              String
-  messageFrom            String
-  messageTo              String
-  messageDirection       String
-  messageBody         String
-  messageMedia  Json?
-  messageStatus          String
-  messageUserId          String
-  messagePhoneNumberId   String
-  messageConversationId  String
-  messagePhoneJson       Json
-  logId String @db.Uuid
-  log    activity_logs   @relation(fields: [logId], references: [id])
+model failed_activity_logs {
+  id                  String       @id @default(uuid()) @db.Uuid
+  failMessage         String
+  openPhonePayload    Json
 }
