@@ -33,9 +33,9 @@ const CommentsListHandler = async (req: NextRequest): Promise<NextResponse> => {
       throw new ApiError(StatusCode.badrequest, 'Record not found!');
     }
 
-    const { skip = 0, take = 5 } = req.pagination || {};
+    // const { skip = 0, take = 5 } = req.pagination || {};
 
-    const [comments, totalCount] = await Promise.all([
+    const [comments] = await Promise.all([
       prisma.comments.findMany({
         where: { recordId: id },
         include: {
@@ -47,10 +47,10 @@ const CommentsListHandler = async (req: NextRequest): Promise<NextResponse> => {
             },
           },
         },
-        skip,
-        take,
+        // skip,
+        // take,
       }),
-      prisma.comments.count({ where: { recordId: id } }),
+      // prisma.comments.count({ where: { recordId: id } }),
     ]);
 
     return NextResponse.json(
@@ -58,7 +58,7 @@ const CommentsListHandler = async (req: NextRequest): Promise<NextResponse> => {
         success: true,
         message: 'Comments Fetched successfully',
         data: comments,
-        totalCount,
+        // totalCount,
       },
       { status: StatusCode.success }
     );

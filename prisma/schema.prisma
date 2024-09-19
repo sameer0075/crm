@@ -76,7 +76,7 @@ model records {
 model activity_logs {
   id                  String       @id @default(uuid()) @db.Uuid
   type                String // email,phone,message,comment
-  openPhoneType       String
+  openPhoneType       String?
   logType             String
   recordId            String?       @db.Uuid
   emailText String?

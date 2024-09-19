@@ -1,9 +1,10 @@
 import React from 'react';
 import Lead from '../comments';
+import { CommentsInterface } from '@/redux/slices/commentSlice';
 
 // # TODO: Replace SVG's with image tags
 
-const Stepper = () => (
+const Stepper = ({ data }: CommentsInterface[]) => (
   <section>
     <div className="rounded-lg bg-gradient-to-br from-white  via-white to-transparent shadow-lg  p-4 flex flex-col ">
       <ol className="flex pt-20 max-w-[500px] min-w-[500px] w-full mx-auto ">
@@ -117,7 +118,7 @@ const Stepper = () => (
           </span>
         </li>
       </ol>
-      <Lead />
+      <Lead data={data} />
     </div>
   </section>
 );

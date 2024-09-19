@@ -12,4 +12,9 @@ const ActivityLogs = {
   logsList: (id: string, type?: string) => `/logs/${id}?type=${type ?? ''}`,
 };
 
-export { AuthEndpoints, LeadEndpoints, ActivityLogs };
+const CommentsEndpoints = {
+  commentsList: (id: string) => `/comments/list/${id}`,
+  addComment: () => `/comments/add`,
+};
+
+export { AuthEndpoints, LeadEndpoints, ActivityLogs, CommentsEndpoints };
