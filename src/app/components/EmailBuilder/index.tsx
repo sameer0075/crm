@@ -1,10 +1,10 @@
+import React, { useState, KeyboardEvent } from "react";
 import { X } from "lucide-react";
-import React, { useState } from "react";
 
 const EmailComposer: React.FC = () => {
-    const [to, setTo] = useState<string>("");
-    const [cc, setCc] = useState<string>("");
-    const [bcc, setBcc] = useState<string>("");
+    const [to, setTo] = useState<string[]>([]);
+    const [cc, setCc] = useState<string[]>([]);
+    const [bcc, setBcc] = useState<string[]>([]);
     const [subject, setSubject] = useState<string>("");
     const [body, setBody] = useState<string>("");
     const [attachments, setAttachments] = useState<File[]>([]);
@@ -13,8 +13,44 @@ const EmailComposer: React.FC = () => {
     const [isVisible, setIsVisible] = useState<boolean>(true);
     const [showCc, setShowCc] = useState<boolean>(false);
     const [showBcc, setShowBcc] = useState<boolean>(false);
+    const [showRecipientLabel, setShowRecipientLabel] = useState<boolean>(true);
 
+    const handleEmailAddition = (
+        e: KeyboardEvent<HTMLInputElement>,
+        setEmails: React.Dispatch<React.SetStateAction<string[]>>,
+        emails: string[]
+    ) => {
+        if (e.key === "Enter" || e.key === ",") {
+            e.preventDefault();
+            const newEmail = (e.target as HTMLInputElement).value.trim();
+            if (newEmail && !emails.includes(newEmail)) {
+                setEmails([...emails, newEmail]);
+            }
+            (e.target as HTMLInputElement).value = "";
+            setShowRecipientLabel(false);
+        }
+    };
 
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const files = Array.from(e.target.files);
+            setAttachments((prev) => [...prev, ...files]);
+        }
+    };
+
+    const handleEmailRemove = (
+        emailToRemove: string,
+        setEmails: React.Dispatch<React.SetStateAction<string[]>>,
+        emails: string[]
+    ) => {
+        setEmails(emails.filter((email) => email !== emailToRemove));
+    };
+
+    const handleFocusOnSubjectOrBody = () => {
+        if (to.length === 0) {
+            setShowRecipientLabel(true);
+        }
+    };
 
     const handleSend = () => {
         console.log({
@@ -27,22 +63,10 @@ const EmailComposer: React.FC = () => {
         });
     };
 
-    const handleClose = () => {
-        setIsVisible(false);
-    };
-
-    const handleMinimize = () => {
-        setIsMinimized(!isMinimized);
-    };
-
-    const handleResize = () => {
-        setIsFullScreen(!isFullScreen);
-    };
-
     const handleDelete = () => {
-        setTo("");
-        setCc("");
-        setBcc("");
+        setTo([]);
+        setCc([]);
+        setBcc([]);
         setSubject("");
         setBody("");
         setAttachments([]);
@@ -56,125 +80,160 @@ const EmailComposer: React.FC = () => {
         }
     };
 
-    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files) {
-            const imageFiles = Array.from(e.target.files);
-            setAttachments((prev) => [...prev, ...imageFiles]);
-        }
-    };
-
     if (!isVisible) return null;
 
     return (
-        <div
-            className={`${isFullScreen ? "w-full h-screen" : "max-w-[600px] w-[600px]"} mx-auto bg-white shadow-lg rounded-lg mt-10 border relative`}
-        >
-            {/* Header */}
-            <div className="border-b p-2 flex justify-between items-center bg-[#424242] rounded-tl-[8px] rounded-br-none rounded-tr-[8px] rounded-bl-none">
-                <h2 className="text-[14px] font-medium text-white">New Message</h2>
-                <div className="space-x-3 flex">
-                    <button onClick={handleMinimize}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M2.75 11.2085H12.75V13.2085H2.75V11.2085Z" fill="white" fillOpacity="0.6" />
-                        </svg>
-                    </button>
-                    <button onClick={handleResize}>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
-                            <path d="M13 7.44444V3H8.55556L10.3833 4.82778L4.82778 10.3833L3 8.55556V13H7.44444L5.61667 11.1722L11.1722 5.61667L13 7.44444Z" fill="white" fillOpacity="0.6" />
-                        </svg>
-                    </button>
-                    <button onClick={handleClose} className="text-[#FFFFFF99] ">
-                        <X size={16} />
-                    </button>
-                </div>
-            </div>
-
+        <div>
             {!isMinimized && (
-                <>
-                    {/* Email inputs */}
+
+                <div
+                    className={`${isMinimized ? "h-[600px]  " : isFullScreen ? "w-[1000px] h-[600px] " : "max-w-[600px] w-[600px]"
+                        } fixed mx-auto bg-white shadow-lg rounded-lg mt-10 border ${isFullScreen ? "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" : "bottom-0 right-4"}  transition-all  duration-300`}
+                    style={{ zIndex: 1000 }} >
+                    {/* Header  */}
+                    <div className="border-b p-2 flex justify-between items-center bg-[#424242] rounded-tl-[8px] rounded-br-none rounded-tr-[8px] rounded-bl-none">
+                        <h2 className="text-[14px] font-medium text-white">New Message</h2>
+                        <div className="space-x-3 flex">
+                            <button onClick={() => setIsMinimized(!isMinimized)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M2.75 11.2085H12.75V13.2085H2.75V11.2085Z" fill="white" fillOpacity="0.6" />
+                                </svg>
+                            </button>
+                            <button onClick={() => setIsFullScreen(!isFullScreen)}>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                    <path d="M13 7.44444V3H8.55556L10.3833 4.82778L4.82778 10.3833L3 8.55556V13H7.44444L5.61667 11.1722L11.1722 5.61667L13 7.44444Z" fill="white" fillOpacity="0.6" />
+                                </svg>
+                            </button>
+                            <button onClick={() => setIsVisible(false)} className="text-[#FFFFFF99]">
+                                <X size={16} />
+                            </button>
+                        </div>
+                    </div>
                     <div className="p-2">
-                        <div className="flex items-center">
-                            <label htmlFor="to" className="w-18 text-[#0000008A] font-medium">Recipients</label>
-                            <input
-                                type="email"
-                                id="to"
-                                value={to}
-                                onChange={(e) => setTo(e.target.value)}
-                                placeholder=""
-                                className="w-full p-1 focus:outline-none focus:ring-none"
-                            />
-                            {/* Cc and Bcc buttons */}
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => setShowCc(!showCc)}
-                                    className="text-[#0000008A] hover:underline"
+                        <div className="  border-b ">
+                            {/* To Input */}
+                            <div className="flex items-center mb-2 ">
+                                <label
+                                    htmlFor="to"
+                                    className={`w-[70px] font-medium transition-all ${showRecipientLabel && to.length === 0 ? "text-[#0000008A]" : "text-[#000000]"}
+                            `}
                                 >
-                                    Cc
-                                </button>
-                                <button
-                                    onClick={() => setShowBcc(!showBcc)}
-                                    className="text-[#0000008A] hover:underline"
-                                >
-                                    Bcc
-                                </button>
+                                    {showRecipientLabel && to.length === 0 ? "Recipients" : "To"}
+                                </label>
+                                <div className="flex-grow flex flex-wrap items-center  p-1 ">
+                                    {to.map((email, index) => (
+                                        <div key={index} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full mr-2 mb-1 flex items-center">
+                                            {email}
+                                            <button
+                                                onClick={() => handleEmailRemove(email, setTo, to)}
+                                                className="ml-1 text-blue-500 hover:text-blue-700"
+                                            >
+                                                &times;
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <input
+                                        type="text"
+                                        className="focus:outline-none flex-grow"
+                                        placeholder=""
+                                        onKeyDown={(e) => handleEmailAddition(e, setTo, to)}
+                                        onFocus={() => setShowRecipientLabel(false)}
+                                    />
+                                </div>
+                                {/* CC &Bcc buttons */}
+                                <div className="ml-4 flex gap-2">
+                                    <button onClick={() => setShowCc(!showCc)} className="text-[#0000008A] hover:underline">
+                                        Cc
+                                    </button>
+                                    <button onClick={() => setShowBcc(!showBcc)} className="text-[#0000008A] hover:underline">
+                                        Bcc
+                                    </button>
+                                </div>
                             </div>
+                            {/* Cc Input */}
+                            {showCc && (
+                                <div className="flex items-center mb-2 ">
+                                    <label htmlFor="cc" className="w-[70px] text-[#0000008A] font-medium">
+                                        Cc
+                                    </label>
+                                    <div className="flex-grow flex flex-wrap items-center  p-1 ">
+                                        {cc.map((email, index) => (
+                                            <div key={index} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full mr-2 mb-1 flex items-center">
+                                                {email}
+                                                <button
+                                                    onClick={() => handleEmailRemove(email, setCc, cc)}
+                                                    className="ml-1 text-blue-500 hover:text-blue-700"
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <input
+                                            type="text"
+                                            className="focus:outline-none flex-grow"
+                                            placeholder=""
+                                            onKeyDown={(e) => handleEmailAddition(e, setCc, cc)}
+                                        />
+                                    </div>
+                                </div>
+                            )}
+                            {/* Bcc Input */}
+                            {showBcc && (
+                                <div className="flex items-center mb-2">
+                                    <label htmlFor="bcc" className="w-[70px] text-[#0000008A] font-medium">
+                                        Bcc
+                                    </label>
+                                    <div className="flex-grow flex flex-wrap items-center  p-1 ">
+                                        {bcc.map((email, index) => (
+                                            <div key={index} className="bg-blue-100 text-blue-700 px-2 py-1 rounded-full mr-2 mb-1 flex items-center">
+                                                {email}
+                                                <button
+                                                    onClick={() => handleEmailRemove(email, setBcc, bcc)}
+                                                    className="ml-1 text-blue-500 hover:text-blue-700"
+                                                >
+                                                    &times;
+                                                </button>
+                                            </div>
+                                        ))}
+                                        <input
+                                            type="text"
+                                            className="focus:outline-none flex-grow"
+                                            placeholder=""
+                                            onKeyDown={(e) => handleEmailAddition(e, setBcc, bcc)}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        {/* Cc field */}
-                        {showCc && (
-                            <div className="flex items-center space-x-2">
-                                <label htmlFor="cc" className="w-16 text-[#0000008A] font-medium">Cc</label>
-                                <input
-                                    type="email"
-                                    id="cc"
-                                    value={cc}
-                                    onChange={(e) => setCc(e.target.value)}
-                                    placeholder=""
-                                    className="w-full p-1 focus:outline-none focus:ring-none"
-                                />
-                            </div>
-                        )}
-
-                        {/* Bcc field */}
-                        {showBcc && (
-                            <div className="flex items-center">
-                                <label htmlFor="bcc" className="w-16 text-[#0000008A] font-medium">Bcc</label>
-                                <input
-                                    type="email"
-                                    id="bcc"
-                                    value={bcc}
-                                    onChange={(e) => setBcc(e.target.value)}
-                                    placeholder=""
-                                    className="w-full p-1 focus:outline-none focus:ring-none"
-                                />
-                            </div>
-                        )}
-
-                        <div className="flex items-center border-b border-t border-gray-300">
-                            <label htmlFor="subject" className="w-16 text-[#0000008A] font-medium">Subject</label>
+                        {/*Subject  Input */}
+                        <div className="flex items-center border-b mb-2 py-2">
+                            <label htmlFor="subject" className="w-[70px] text-[#0000008A] font-medium">
+                                Subject
+                            </label>
                             <input
                                 type="text"
                                 id="subject"
+                                className="flex-grow focus:outline-none"
                                 value={subject}
                                 onChange={(e) => setSubject(e.target.value)}
-                                placeholder=""
-                                className="w-full p-2 focus:outline-none focus:ring-none"
+                                onFocus={handleFocusOnSubjectOrBody}
                             />
                         </div>
-
+                        {/* Body Input */}
                         <div>
                             <textarea
                                 id="body"
+                                className="w-full h-[400px]  resize-none focus:outline-none"
+                                rows={5}
+                                placeholder="Email here"
                                 value={body}
                                 onChange={(e) => setBody(e.target.value)}
-                                placeholder="Email here"
-                                className="w-full h-[400px] p-2 focus:outline-none focus:ring-none overflow-y-auto"
-                                style={{ resize: 'none', }}
-                            ></textarea>
+                                onFocus={handleFocusOnSubjectOrBody}
+                            />
                         </div>
-
-                        {/* Footer */}
-                        <div className="border-t p-2 flex justify-between">
+                        {/* Footer  */}
+                        <div className=" p-2 flex justify-between">
                             <div className="flex space-x-4">
                                 <button
                                     onClick={handleSend}
@@ -182,7 +241,6 @@ const EmailComposer: React.FC = () => {
                                 >
                                     Send
                                 </button>
-                                {/* Attachment buttons */}
                                 <div className="flex space-x-2">
                                     <label className="flex items-center cursor-pointer">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
@@ -216,15 +274,36 @@ const EmailComposer: React.FC = () => {
                             </button>
                         </div>
                     </div>
-                </>
-            )}
-
-            {isMinimized && (
-                <div className="text-center text-gray-500 ">
                 </div>
             )}
+
+            {/* Minimized Header */}
+            {/* Minimized Header */}
+            {isMinimized && (
+                <div className="fixed bottom-[-5px] right-4 p-2 flex justify-between items-center bg-[#424242] rounded-lg shadow-lg w-[300px]">
+                    <h2 className="text-[14px] font-medium text-white">New Message</h2>
+                    <div className="space-x-3 flex">
+                        <button onClick={() => setIsMinimized(!isMinimized)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M2.75 11.2085H12.75V13.2085H2.75V11.2085Z" fill="white" fillOpacity="0.6" />
+                            </svg>
+                        </button>
+                        <button onClick={() => setIsFullScreen(!isFullScreen)}>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M13 7.44444V3H8.55556L10.3833 4.82778L4.82778 10.3833L3 8.55556V13H7.44444L5.61667 11.1722L11.1722 5.61667L13 7.44444Z" fill="white" fillOpacity="0.6" />
+                            </svg>
+                        </button>
+                        <button onClick={() => setIsVisible(false)} className="text-[#FFFFFF99]">
+                            <X size={16} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
         </div>
     );
 };
 
 export default EmailComposer;
+
+
