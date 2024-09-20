@@ -276,8 +276,6 @@ const EmailComposer: React.FC = () => {
                     </div>
                 </div>
             )}
-
-            {/* Minimized Header */}
             {/* Minimized Header */}
             {isMinimized && (
                 <div className="fixed bottom-[-5px] right-4 p-2 flex justify-between items-center bg-[#424242] rounded-lg shadow-lg w-[300px]">

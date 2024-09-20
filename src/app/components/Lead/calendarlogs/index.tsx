@@ -31,13 +31,13 @@ const CalendarLogs = ({ data }: LogsInterface) => {
                 </svg>
               </div>
               <div className="w-full">
-                <h1 className="text-[#3673D4] text-[12px] font-bold pb-[2px]">
+                <h1 className="text-[#3673D4] text-[12px] font-bold pb-[2px] break-words">
                   {step.type &&
                     step.type[0]?.toUpperCase() + step.type.slice(1)}
                 </h1>
-                <div className="flex justify-between items-center text-black text-[12px]">
-                  <p>You logged a call</p>
-                  <p>{step.callDuration ?? 'N/A'}</p>
+                <div className="grid grid-cols-12 justify-between  text-black text-[12px]">
+                  <p className='break-words col-span-8'>You logged a call</p>
+                  <p className='break-words col-span-4 text-end'>{step.callDuration ?? 'N/A'}</p>
                 </div>
               </div>
               <div
@@ -46,6 +46,7 @@ const CalendarLogs = ({ data }: LogsInterface) => {
             </div>
           ))}
         </div>
+
       </div>
     </section>
   );

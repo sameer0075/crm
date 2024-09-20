@@ -50,13 +50,13 @@ const CallActivity = ({ data }: LogsInterface) => {
                 {step.type === 'comment' && <MessageCircle />}
               </div>
               <div className="bg-[#D9D9D9] rounded-md w-full p-2 bg-opacity-20">
-                <h1 className="text-[#3673D4] text-[12px] font-bold pb-[2px]">
+                <h1 className="text-[#3673D4] text-[12px] font-bold pb-[2px] break-words">
                   {step.type &&
                     step.type[0]?.toUpperCase() + step.type.slice(1)}
                 </h1>
-                <div className="flex justify-between items-center text-black text-[12px]">
-                  <p>You logged a {step.type.toLowerCase()}</p>
-                  <p>{step.callDuration}</p>
+                <div className="grid grid-cols-12 justify-between items-center text-black text-[12px]">
+                  <p className="col-span-9 break-words">You logged a {step.type.toLowerCase()}</p>
+                  <p className="col-span-3 break-words">{step.callDuration}</p>
                 </div>
               </div>
               {index < data?.length - 1 && (
