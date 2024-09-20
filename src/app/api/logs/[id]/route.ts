@@ -15,50 +15,43 @@ const prisma = new PrismaClient();
  * @param {NextRequest} req - The Next.js request object
  * @returns {Promise<NextResponse>} - The response object with the records data
  */
-const CommentsListHandler = async (req: NextRequest): Promise<NextResponse> => {
+const ActivityLogsListHandler = async (
+  req: NextRequest
+): Promise<NextResponse> => {
   try {
     const id = req.nextUrl.pathname.split('/').pop();
+    const type = req.nextUrl.searchParams.get('type');
     if (!id) {
       throw new ApiError(StatusCode.badrequest, 'Record id is required!');
     }
 
-    const record = await prisma.records.findFirst({
-      where: {
-        id,
-        is_active: true,
-      },
-    });
-
-    if (!record) {
-      throw new ApiError(StatusCode.badrequest, 'Record not found!');
-    }
-
-    // const { skip = 0, take = 5 } = req.pagination || {};
-
-    const [comments] = await Promise.all([
-      prisma.comments.findMany({
-        where: { recordId: id },
-        include: {
-          record: true,
-          user: {
-            select: {
-              id: true,
-              name: true,
-            },
+    let logs;
+    if (type && type != 'all') {
+      logs = await prisma.activity_logs.findMany({
+        where: {
+          recordId: id,
+          type,
+          record: {
+            is_active: true,
           },
         },
-        // skip,
-        // take,
-      }),
-      // prisma.comments.count({ where: { recordId: id } }),
-    ]);
+      });
+    } else {
+      logs = await prisma.activity_logs.findMany({
+        where: {
+          recordId: id,
+          record: {
+            is_active: true,
+          },
+        },
+      });
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Comments Fetched successfully',
-        data: comments,
-        // totalCount,
+        message: 'Activity Logs Fetched successfully.',
+        data: logs,
       },
       { status: StatusCode.success }
     );
@@ -81,5 +74,5 @@ export const GET = async (req: NextRequest) => {
   }
 
   // Call the main handler
-  return globalErrorHandler(CommentsListHandler)(req);
+  return globalErrorHandler(ActivityLogsListHandler)(req);
 };

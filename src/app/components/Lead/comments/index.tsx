@@ -1,19 +1,37 @@
 import React, { ChangeEvent, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useSearchParams } from 'next/navigation';
+
+import { CommentsInterface, addComment } from '@/redux/slices/commentSlice';
+import { AppDispatch } from '@/redux/store';
+
 import TextArea from '../../TextArea';
 import Select from '../../Select';
 import Button from '../../Button';
 
-const Lead = () => {
+const Lead = ({ data }: CommentsInterface[]) => {
   const [comment, setComment] = useState<string>('');
-  /**
-   * Handles changes to the form data.
-   *
-   * @param {ChangeEvent<HTMLInputElement>} e - The change event.
-   */
+  const details = useSelector((state) => state.leads.details);
+  const loading = useSelector((state) => state.comments.isLoading);
+  const dispatch = useDispatch<AppDispatch>();
+
+  const params = useSearchParams();
+  const id = params.get('id');
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
   };
-  const handleSubmit = () => {};
+  const handleSubmit = () => {
+    // window.open('openphone://dial?number=8002752273');
+    dispatch(
+      addComment({
+        comment,
+        recordId: id,
+      })
+    ).then(() => {
+      setComment('');
+    });
+  };
   return (
     <div className="w-full flex justify-center px-4 sm:px-0">
       <div className="w-full sm:w-[500px] md:w-[600px] p-4 sm:p-6 lg:w-[670px] flex-shrink-0 ">
@@ -28,7 +46,7 @@ const Lead = () => {
             Title
           </div>
           <div className="col-span-5 sm:col-span-6 text-[#111] font-normal text-xs font-roboto">
-            International Sales Director
+            {details?.title ?? 'N/A'}
           </div>
           <div className="col-span-2 flex justify-end items-center">
             <img
@@ -39,36 +57,44 @@ const Lead = () => {
         </div>
         <hr className="mt-2" />
         <div className="grid grid-cols-12 mt-1">
-          <div className="col-span-5 sm:col-span-4 text-[#E0E0E0] font-normal text-xs font-roboto">
+          <div
+            className={`col-span-5 sm:col-span-4 ${data?.length > 0 ? '' : 'text-[#E0E0E0]'} font-normal text-xs font-roboto`}
+          >
             Email
           </div>
-          <div className="col-span-7 sm:col-span-6 text-[#E0E0E0] font-normal text-xs font-roboto">
-            info@email.com
+          <div
+            className={`col-span-7 sm:col-span-6 ${data?.length > 0 ? '' : 'text-[#E0E0E0]'} font-normal text-xs font-roboto1`}
+          >
+            {details?.email ?? 'N/A'}
           </div>
         </div>
         <hr className="mt-2" />
         <div className="grid grid-cols-12 mt-1">
-          <div className="col-span-5 sm:col-span-4 text-[#E0E0E0] font-normal text-xs font-roboto">
+          <div
+            className={`col-span-5 sm:col-span-4 ${data?.length > 0 ? '' : 'text-[#E0E0E0]'} font-normal text-xs font-roboto`}
+          >
             Phone
           </div>
-          <div className="col-span-7 sm:col-span-6 text-[#E0E0E0] font-normal text-xs font-roboto">
-            1 (800) 667-6389
+          <div
+            className={`col-span-7 sm:col-span-6 ${data?.length > 0 ? '' : 'text-[#E0E0E0]'} font-normal text-xs font-roboto`}
+          >
+            {details?.phone ?? 'N/A'}
           </div>
         </div>
         <p className="text-[#3673D4] font-medium text-xs font-roboto pt-4">
           Guidance for Success
         </p>
-        <p className="text-[#111] font-medium text-xs font-roboto pt-4">
-          Qualify promising leads.
-        </p>
         <ul className="list-disc px-5 py-4">
-          <li className="text-[#111] font-normal text-xs font-roboto">
-            Identify a contact for the lead to be converted to be opportunity.
-          </li>
-          <li className="text-[#111] font-normal text-xs font-roboto pt-3">
-            Please add the product information to be shared with the client so
-            that the phone number and email can be activated.
-          </li>
+          {data?.map((comment: CommentsInterface, index: number) => {
+            return (
+              <li
+                key={index}
+                className="text-[#111] font-normal text-xs font-roboto"
+              >
+                {comment.comment}
+              </li>
+            );
+          })}
         </ul>
         <div>
           <div className="flex justify-between items-center mb-2 mt-3">
@@ -94,11 +120,11 @@ const Lead = () => {
         <div className="flex justify-end mt-4">
           <Button
             handleClick={handleSubmit}
-            className="h-10 w-[86px] gap-4 bg-[#3673D4]"
+            className={`h-10 w-[86px] gap-4 bg-[#3673D4] ${comment === '' ? 'opacity-40' : ''}`}
             text="Save"
             type="button"
-            loading={false}
-            disabled={false}
+            loading={loading}
+            disabled={comment === ''}
           />
         </div>
       </div>

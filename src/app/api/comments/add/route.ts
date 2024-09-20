@@ -29,11 +29,32 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
       },
     });
 
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.userId,
+      },
+    });
+
+    const logPayload = {
+      type: 'comment',
+      logType: 'LEAD',
+      record: {
+        connect: {
+          id: payload.recordId,
+        },
+      },
+      eventCreation: new Date(),
+      from: user.phone,
+    };
+
+    const activityLog = await prisma.activity_logs.create({ data: logPayload });
+
     return NextResponse.json(
       {
         success: true,
         message: 'Comment created successfully',
         data,
+        log: activityLog,
       },
       { status: StatusCode.success }
     );
