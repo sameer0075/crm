@@ -8,6 +8,7 @@ import CallActivity from '../components/Lead/activity';
 import ActivityLog from '../components/Lead/activitylog';
 import CalendarLogs from '../components/Lead/calendarlogs';
 import ContactRoles from '../components/Lead/contactroles';
+import Loader from '../components/loader';
 import Novatore from '../components/Lead/novatore';
 import DetailLogs from '../components/Lead/details';
 import CallNow from '../components/Lead/callnow';
@@ -18,6 +19,7 @@ import { AppDispatch } from '@/redux/store';
 
 const Page = () => {
   const [details, setDetails] = useState(null);
+  const [loading, setLoading] = useState(false);
   const [phoneLogsData, setPhoneLogsData] = useState([]);
   const [contactRoles, setContactRoles] = useState(null);
   const data = useSelector((state) => state.leads.details);
@@ -30,9 +32,22 @@ const Page = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(leadDetails({ id }));
-      dispatch(getComments({ id }));
-      dispatch(getLogs({ id, type: 'all' }));
+      // dispatch(leadDetails({ id }));
+      // dispatch(getComments({ id }));
+      // dispatch(getLogs({ id, type: 'all' }));
+      setLoading(true);
+      Promise.all([
+        dispatch(leadDetails({ id })).unwrap(),
+        dispatch(getComments({ id })).unwrap(),
+        dispatch(getLogs({ id, type: 'all' })).unwrap(),
+      ])
+        .then(() => {
+          setLoading(false);
+        })
+        .catch(() => {
+          // Handle errors if needed
+          setLoading(false); // Also hide the loader in case of an error
+        });
     }
   }, []);
 
@@ -74,6 +89,11 @@ const Page = () => {
 
   return (
     <section className="py-6 ">
+      {loading && (
+        <div className="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+          <Loader />
+        </div>
+      )}
       <div className="w-full px-4">
         <div className="grid grid-cols-12 gap-4">
           {/* First Column */}
