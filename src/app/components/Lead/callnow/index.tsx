@@ -1,7 +1,14 @@
 'use client';
 import React from 'react';
+import EmailBuilder from '../../EmailBuilder';
+import { useState } from 'react';
 
 const CallNow = () => {
+  const [isOpen, setIsOpen] = useState(false);
+
+  const handleBoxClick = () => {
+    setIsOpen(true);
+  };
   const handleClick = () => {
     window.open('openphone://dial?number=8002752273');
   };
@@ -25,7 +32,7 @@ const CallNow = () => {
 
         <h1 className="text-[14px] font-semibold ml-2">Call Now</h1>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center" onClick={handleBoxClick}>
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -42,6 +49,7 @@ const CallNow = () => {
         </div>
 
         <h1 className="text-[14px] font-semibold ml-2">Email Now</h1>
+        {isOpen && <EmailBuilder />}
       </div>
     </div>
   );
