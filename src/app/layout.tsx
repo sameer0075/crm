@@ -29,7 +29,7 @@ export default function RootLayout({
   const handleAthentication = () => {
     const token = sessionStorage.getItem('token');
     if (!token) {
-      // router.push('/');
+      router.push('/');
     }
   };
 

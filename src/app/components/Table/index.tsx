@@ -49,6 +49,15 @@ export default function Table({
     page: 1,
   });
 
+  const [sortField, setSortField] = useState(null);
+  const [sortOrder, setSortOrder] = useState(null);
+
+  const onSort = (event) => {
+    console.log('event', event);
+    setSortField(event.sortField);
+    setSortOrder(event.sortOrder);
+  };
+
   const paginatorLeft = (
     <Button
       type="button"
@@ -59,7 +68,22 @@ export default function Table({
   );
 
   const processedData = useMemo(() => {
-    return data?.map((item) => {
+    const payload = data ? [...data] : [];
+    const sortedData = payload.sort((a, b) => {
+      if (!sortField) return 0; // No sorting applied
+      const valueA = a[sortField] || ''; // Ensure undefined or null values are handled
+      const valueB = b[sortField] || '';
+
+      let comparison = 0;
+      if (valueA < valueB) {
+        comparison = -1;
+      } else if (valueA > valueB) {
+        comparison = 1;
+      }
+      return sortOrder === 1 ? comparison : -comparison;
+    });
+
+    return sortedData?.map((item) => {
       const { lead_source, updatedAt, ...rest } = item;
       const processedItem = Object.fromEntries(
         Object.entries(rest).map(([key, value]) => [key, value || 'N/A'])
@@ -92,7 +116,7 @@ export default function Table({
         ),
       };
     });
-  }, [data]);
+  }, [data, sortField, sortOrder]);
 
   const onPageChange = (event: PaginationState) => {
     setPagination((prev) => ({
@@ -151,6 +175,9 @@ export default function Table({
           onChange={onPageChange}
           onPage={onPageChange}
           onRowsPerPageChange={onRowsPerPageChange}
+          onSort={onSort}
+          sortField={sortField}
+          sortOrder={sortOrder}
         >
           <Column
             header={
@@ -172,10 +199,10 @@ export default function Table({
             return (
               <Column
                 key={index}
-                field={label.label ?? 'N/A'}
+                field={label?.label ?? 'N/A'}
                 header={label.header}
                 sortable={label.sortable}
-                className="max-w-[200px] min-w-[200px] w-auto"
+                className="max-w-[auto] min-w-[auto] w-[200px]"
               />
             );
           })}

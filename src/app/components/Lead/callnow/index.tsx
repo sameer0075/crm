@@ -1,20 +1,34 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
 import EmailBuilder from '../../EmailBuilder';
-import { useState } from 'react';
 
-const CallNow = () => {
-  const [isOpen, setIsOpen] = useState(false);
+interface CallNowInterface {
+  totalComments: number;
+  phone: number;
+}
+
+const CallNow = ({ totalComments, phone }: CallNowInterface) => {
+  const [emailBuilders, setEmailBuilders] = useState<number[]>([]);
 
   const handleBoxClick = () => {
-    setIsOpen(true);
+    setEmailBuilders([...emailBuilders, emailBuilders.length]); // Add a new instance
   };
+
   const handleClick = () => {
-    window.open('openphone://dial?number=8002752273');
+    if (totalComments > 0) {
+      window.open(`openphone://dial?number=${phone}`);
+    }
   };
+
   return (
-    <div className="text-[16px] font-semibold rounded-lg bg-white p-4 flex justify-between items-center bg-gradient-to-br from-white via-transparent to-transparent shadow-lg shadow-gray-300">
-      <div onClick={handleClick} className="flex items-center cursor-pointer">
+    <div className="grid grid-cols-2 text-[16px] font-semibold rounded-lg bg-white p-4  justify-between items-center bg-gradient-to-br from-white via-transparent to-transparent shadow-lg shadow-gray-300">
+      <div
+        onClick={handleClick}
+        className={`flex items-center ${totalComments === 0
+          ? 'cursor-not-allowed opacity-50'
+          : 'cursor-pointer'
+          }`}
+      >
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -32,7 +46,7 @@ const CallNow = () => {
 
         <h1 className="text-[14px] font-semibold ml-2">Call Now</h1>
       </div>
-      <div className="flex items-center" onClick={handleBoxClick}>
+      <div className="flex items-center " onClick={handleBoxClick}>
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -49,9 +63,12 @@ const CallNow = () => {
         </div>
 
         <h1 className="text-[14px] font-semibold ml-2">Email Now</h1>
-        {isOpen && <EmailBuilder />}
       </div>
+      {emailBuilders.map((_, index) => (
+        <EmailBuilder key={index} />
+      ))}
     </div>
   );
 };
+
 export default CallNow;

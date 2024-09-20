@@ -8,6 +8,11 @@ const ActivityLog = ({ data }: CommentsInterface) => (
       <h2 className="text-lg font-semibold text-black pb-[12px]">
         Activity Log
       </h2>
+      {data?.length === 0 && (
+        <p className="text-[#111] pt-2 text-center font-medium text-xs font-roboto">
+          No Data Found
+        </p>
+      )}
       <div className="flex flex-col relative">
         {data?.map((log, index) => {
           const dateObject = new Date(log.createdAt);

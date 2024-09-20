@@ -13,7 +13,7 @@ import Novatore from '../components/Lead/novatore';
 import DetailLogs from '../components/Lead/details';
 import CallNow from '../components/Lead/callnow';
 import { leadDetails } from '@/redux/slices/lead-slice';
-import { getLogs } from '@/redux/slices/logs-slice';
+import { getLogs, clearLogs } from '@/redux/slices/logs-slice';
 import { getComments } from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
 import EmailBuilder from '../components/EmailBuilder';
@@ -22,6 +22,8 @@ const Page = () => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [phoneLogsData, setPhoneLogsData] = useState([]);
+  const [logsData, setLogsData] = useState([]);
+
   const [contactRoles, setContactRoles] = useState(null);
   const data = useSelector((state) => state.leads.details);
   const allLogs = useSelector((state) => state.logs.allLogs);
@@ -30,12 +32,8 @@ const Page = () => {
 
   const params = useSearchParams();
   const id = params.get('id');
-
   useEffect(() => {
     if (id) {
-      // dispatch(leadDetails({ id }));
-      // dispatch(getComments({ id }));
-      // dispatch(getLogs({ id, type: 'all' }));
       setLoading(true);
       Promise.all([
         dispatch(leadDetails({ id })).unwrap(),
@@ -50,7 +48,7 @@ const Page = () => {
           setLoading(false); // Also hide the loader in case of an error
         });
     }
-  }, []);
+  }, [id]);
 
   useEffect(() => {
     if (data) {
@@ -83,10 +81,22 @@ const Page = () => {
 
   useEffect(() => {
     if (allLogs?.length > 0) {
+      setLogsData(allLogs);
       const phonelogs = allLogs.filter((log) => log.type === 'call');
       setPhoneLogsData(phonelogs);
     }
   }, [allLogs]);
+
+  useEffect(() => {
+    return () => {
+      setLoading(false);
+      setPhoneLogsData([]);
+      setContactRoles(null);
+      setDetails(null);
+      setLogsData([]);
+      dispatch(clearLogs());
+    };
+  }, []);
 
   return (
     <section className="py-6 ">
@@ -106,12 +116,15 @@ const Page = () => {
           {/* Second Column */}
           <div className="col-span-12 md:col-span-6 flex flex-col gap-4">
             <Stepper data={comments} />
-            <CallActivity data={allLogs} />
+            <CallActivity data={logsData} />
 
           </div>
           {/* Third Column */}
           <div className="col-span-12 md:col-span-3 flex flex-col gap-4">
-            <CallNow />
+            <CallNow
+              totalComments={comments?.length ?? 0}
+              phone={details?.phone}
+            />
             <CalendarLogs data={phoneLogsData} />
             <ActivityLog data={comments} />
 
