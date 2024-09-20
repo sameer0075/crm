@@ -88,8 +88,8 @@ const EmailComposer: React.FC = () => {
 
                 <div
                     className={`${isMinimized ? "h-[600px]  " : isFullScreen ? "w-[1000px] h-[600px] " : "max-w-[600px] w-[600px]"
-                        } fixed mx-auto bg-white shadow-lg rounded-lg mt-10 border ${isFullScreen ? "top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" : "bottom-0 right-4"}  transition-all  duration-300`}
-                    style={{ zIndex: 1000 }} >
+                        } fixed mx-auto bg-white shadow-lg rounded-lg mt-10 border ${isFullScreen ? " top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 " : "bottom-0 right-4"}  transition-all  duration-300`}
+                    style={{ zIndex: 1000, height: '600px' }} >
                     {/* Header  */}
                     <div className="border-b p-2 flex justify-between items-center bg-[#424242] rounded-tl-[8px] rounded-br-none rounded-tr-[8px] rounded-bl-none">
                         <h2 className="text-[14px] font-medium text-white">New Message</h2>
@@ -109,7 +109,7 @@ const EmailComposer: React.FC = () => {
                             </button>
                         </div>
                     </div>
-                    <div className="p-2">
+                    <div className="p-2 flex flex-col h-full">
                         <div className="  border-b ">
                             {/* To Input */}
                             <div className="flex items-center mb-2 ">
@@ -221,10 +221,10 @@ const EmailComposer: React.FC = () => {
                             />
                         </div>
                         {/* Body Input */}
-                        <div>
+                        <div className="flex-grow">
                             <textarea
                                 id="body"
-                                className="w-full h-[400px]  resize-none focus:outline-none"
+                                className="w-full h-full resize-none focus:outline-none"
                                 rows={5}
                                 placeholder="Email here"
                                 value={body}
@@ -233,7 +233,7 @@ const EmailComposer: React.FC = () => {
                             />
                         </div>
                         {/* Footer  */}
-                        <div className=" p-2 flex justify-between">
+                        <div className=" p-2 flex justify-between mb-10" >
                             <div className="flex space-x-4">
                                 <button
                                     onClick={handleSend}

@@ -16,6 +16,7 @@ import { leadDetails } from '@/redux/slices/lead-slice';
 import { getLogs } from '@/redux/slices/logs-slice';
 import { getComments } from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
+import EmailBuilder from '../components/EmailBuilder';
 
 const Page = () => {
   const [details, setDetails] = useState(null);
@@ -112,6 +113,7 @@ const Page = () => {
             <CallNow />
             <CalendarLogs data={phoneLogsData} />
             <ActivityLog data={comments} />
+            <EmailBuilder />
           </div>
         </div>
       </div>
