@@ -62,7 +62,10 @@ const CallActivity = ({ data }: LogsInterface) => {
                     step.type[0]?.toUpperCase() + step.type.slice(1)}
                 </h1>
                 <div className="flex justify-between items-center text-black text-[12px]">
-                  <p>You logged a {step.type.toLowerCase()}</p>
+                  <p>
+                    You logged {step.type === 'email' ? 'an' : 'a'}{' '}
+                    {step.type.toLowerCase()}
+                  </p>
                   <p>{step.callDuration}</p>
                 </div>
               </div>

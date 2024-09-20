@@ -106,7 +106,7 @@ export default function Table({
         updatedAt: moment(updatedAt).format('DD/MM/YYYY'),
         view: (
           <div
-            className="cursor-pointer ml-1"
+            className="cursor-pointer ml-1 w-[50px]"
             onClick={() => handleView(rest.id)}
           >
             <img
@@ -203,6 +203,7 @@ export default function Table({
                 header={label.header}
                 sortable={label.sortable}
                 className="max-w-[auto] min-w-[auto] w-[200px]"
+                // className="max-w-[200px] min-w-[200px] w-auto"
               />
             );
           })}
