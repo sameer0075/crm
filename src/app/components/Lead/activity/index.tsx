@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { MessageCircle } from 'lucide-react';
 import { LogsInterface } from '@/redux/slices/logs-slice';
 
 const CallActivity = ({ data }: LogsInterface) => {
@@ -45,6 +46,8 @@ const CallActivity = ({ data }: LogsInterface) => {
                     />
                   </svg>
                 )}
+
+                {step.type === 'comment' && <MessageCircle />}
               </div>
               <div className="bg-[#D9D9D9] rounded-md w-full p-2 bg-opacity-20">
                 <h1 className="text-[#3673D4] text-[12px] font-bold pb-[2px]">

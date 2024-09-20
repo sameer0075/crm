@@ -46,33 +46,6 @@ export const getLogs = createAsyncThunk(
     }
   }
 );
-
-export const getPhoneLogs = createAsyncThunk(
-  'logs/list/phone',
-  async (data: { id: string; type: string }, thunkAPI) => {
-    try {
-      const url = `${ActivityLogs.logsList(data.id, data.type)}`;
-      const resp = await api.get(`${url}`);
-      return resp;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
-export const getCommentLogs = createAsyncThunk(
-  'logs/list/comments',
-  async (data: { id: string; type: string }, thunkAPI) => {
-    try {
-      const url = `${ActivityLogs.logsList(data.id, data.type)}`;
-      const resp = await api.get(`${url}`);
-      return resp;
-    } catch (error) {
-      return thunkAPI.rejectWithValue(error.response.data);
-    }
-  }
-);
-
 const logsSlice = createSlice({
   name: 'leads',
   initialState,
@@ -88,47 +61,6 @@ const logsSlice = createSlice({
       })
       .addCase(
         getLogs.rejected,
-        (state, action: { payload: { message: string } }) => {
-          if (action.payload.message === 'Unauthorized') {
-            sessionStorage.removeItem('token');
-            setTimeout(() => {
-              window.location.href = '/';
-            }, 2000);
-          }
-          toast.error(action.payload.message);
-          state.isLoading = false;
-        }
-      )
-      .addCase(getPhoneLogs.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getPhoneLogs.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.phoneLogs = action.payload.data;
-      })
-      .addCase(
-        getPhoneLogs.rejected,
-        (state, action: { payload: { message: string } }) => {
-          if (action.payload.message === 'Unauthorized') {
-            sessionStorage.removeItem('token');
-            setTimeout(() => {
-              window.location.href = '/';
-            }, 2000);
-          }
-          toast.error(action.payload.message);
-          state.isLoading = false;
-        }
-      )
-
-      .addCase(getCommentLogs.pending, (state) => {
-        state.isLoading = true;
-      })
-      .addCase(getCommentLogs.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.phoneLogs = action.payload.data;
-      })
-      .addCase(
-        getCommentLogs.rejected,
         (state, action: { payload: { message: string } }) => {
           if (action.payload.message === 'Unauthorized') {
             sessionStorage.removeItem('token');

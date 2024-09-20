@@ -12,20 +12,16 @@ import Novatore from '../components/Lead/novatore';
 import DetailLogs from '../components/Lead/details';
 import CallNow from '../components/Lead/callnow';
 import { leadDetails } from '@/redux/slices/lead-slice';
-import {
-  getLogs,
-  getPhoneLogs,
-  getCommentLogs,
-} from '@/redux/slices/logs-slice';
+import { getLogs } from '@/redux/slices/logs-slice';
 import { getComments } from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
 
 const Page = () => {
   const [details, setDetails] = useState(null);
+  const [phoneLogsData, setPhoneLogsData] = useState([]);
   const [contactRoles, setContactRoles] = useState(null);
   const data = useSelector((state) => state.leads.details);
   const allLogs = useSelector((state) => state.logs.allLogs);
-  const phoneLogs = useSelector((state) => state.logs.phoneLogs);
   const comments = useSelector((state) => state.comments.data);
   const dispatch = useDispatch<AppDispatch>();
 
@@ -36,9 +32,7 @@ const Page = () => {
     if (id) {
       dispatch(leadDetails({ id }));
       dispatch(getComments({ id }));
-      dispatch(getPhoneLogs({ id, type: 'call' }));
       dispatch(getLogs({ id, type: 'all' }));
-      dispatch(getCommentLogs({ id, type: 'comment' }));
     }
   }, []);
 
@@ -71,6 +65,13 @@ const Page = () => {
     }
   }, [data]);
 
+  useEffect(() => {
+    if (allLogs?.length > 0) {
+      const phonelogs = allLogs.filter((log) => log.type === 'call');
+      setPhoneLogsData(phonelogs);
+    }
+  }, [allLogs]);
+
   return (
     <section className="py-6 ">
       <div className="w-full px-4">
@@ -89,7 +90,7 @@ const Page = () => {
           {/* Third Column */}
           <div className="col-span-12 md:col-span-3 flex flex-col gap-4">
             <CallNow />
-            <CalendarLogs data={phoneLogs} />
+            <CalendarLogs data={phoneLogsData} />
             <ActivityLog data={comments} />
           </div>
         </div>
