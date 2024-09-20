@@ -1,29 +1,23 @@
 import React, { ChangeEvent, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
-
 import { CommentsInterface, addComment } from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
 import { toast } from 'react-toastify';
-
 import TextArea from '../../TextArea';
 import Select from '../../Select';
 import Button from '../../Button';
-
 const Lead = ({ data }: CommentsInterface[]) => {
   const [comment, setComment] = useState<string>('');
   const [status, setStatus] = useState<string>('');
   const details = useSelector((state) => state.leads.details);
   const loading = useSelector((state) => state.comments.isLoading);
   const dispatch = useDispatch<AppDispatch>();
-
   const params = useSearchParams();
   const id = params.get('id');
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
   };
-
   const handleStatus = (e: ChangeEvent<HTMLInputElement>) => {
     setStatus(e.target.value);
   };
@@ -133,7 +127,6 @@ const Lead = ({ data }: CommentsInterface[]) => {
               handleChange={handleStatus}
             />
           </div>
-
           <TextArea
             id="comment"
             name="comment"
@@ -158,5 +151,4 @@ const Lead = ({ data }: CommentsInterface[]) => {
     </div>
   );
 };
-
 export default Lead;

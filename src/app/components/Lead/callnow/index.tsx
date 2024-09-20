@@ -1,5 +1,6 @@
 'use client';
-import React from 'react';
+import React, { useState } from 'react';
+import EmailBuilder from '../../EmailBuilder';
 
 interface CallNowInterface {
   totalComments: number;
@@ -7,11 +8,18 @@ interface CallNowInterface {
 }
 
 const CallNow = ({ totalComments, phone }: CallNowInterface) => {
+  const [emailBuilders, setEmailBuilders] = useState<number[]>([]);
+
+  const handleBoxClick = () => {
+    setEmailBuilders([...emailBuilders, emailBuilders.length]); // Add a new instance
+  };
+
   const handleClick = () => {
     if (totalComments > 0) {
       window.open(`openphone://dial?number=${phone}`);
     }
   };
+
   return (
     <div className="text-[16px] font-semibold rounded-lg bg-white p-4 flex justify-between items-center bg-gradient-to-br from-white via-transparent to-transparent shadow-lg shadow-gray-300">
       <div
@@ -39,7 +47,7 @@ const CallNow = ({ totalComments, phone }: CallNowInterface) => {
 
         <h1 className="text-[14px] font-semibold ml-2">Call Now</h1>
       </div>
-      <div className="flex items-center">
+      <div className="flex items-center " onClick={handleBoxClick}>
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -57,7 +65,11 @@ const CallNow = ({ totalComments, phone }: CallNowInterface) => {
 
         <h1 className="text-[14px] font-semibold ml-2">Email Now</h1>
       </div>
+      {emailBuilders.map((_, index) => (
+        <EmailBuilder key={index} />
+      ))}
     </div>
   );
 };
+
 export default CallNow;

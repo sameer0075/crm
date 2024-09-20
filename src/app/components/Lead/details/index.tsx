@@ -15,7 +15,7 @@ const DetailLogs = ({ data }) => {
             className="flex justify-between items-center border-b border-gray-200 py-[6px] text-[#000] text-[12px]"
           >
             <div className="w-1/3 text-left px-2">{log.state}</div>
-            <div className="w-1/3 text-left px-2">{log.value}</div>
+            <div className="w-1/3 text-left px-2 break-words">{log.value}</div>
             <div className="ml-auto text-right">
               <img
                 src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/edit.svg`}

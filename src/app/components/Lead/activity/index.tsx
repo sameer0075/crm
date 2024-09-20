@@ -57,7 +57,7 @@ const CallActivity = ({ data }: LogsInterface) => {
                 {step.type === 'comment' && <MessageCircle />}
               </div>
               <div className="bg-[#D9D9D9] rounded-md w-full p-2 bg-opacity-20">
-                <h1 className="text-[#3673D4] text-[12px] font-bold pb-[2px]">
+                <h1 className="text-[#3673D4] text-[12px] font-bold pb-[2px] break-words">
                   {step.type &&
                     step.type[0]?.toUpperCase() + step.type.slice(1)}
                 </h1>
