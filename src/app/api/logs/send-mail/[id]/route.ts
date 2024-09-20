@@ -34,20 +34,22 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
     });
 
     const transporter = nodemailer.createTransport({
-      host: process.env.EMAIL_HOST, // "smtp.gmail.com"
-      port: 587, // Port for Gmail
-      secure: false, // Use TLS
+      host: process.env.EMAIL_HOST,
+      port: 587,
+      secure: false,
       auth: {
-        user: process.env.EMAIL_USERNAME, // "danishtest593@gmail.com"
-        pass: process.env.EMAIL_PASSWORD, // Your Gmail app-specific password
+        user: process.env.EMAIL_USERNAME,
+        pass: process.env.EMAIL_PASSWORD,
       },
     });
 
     const mailOptions = {
       from: `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM_MAIL}>`, // "Danish <danishtest593@gmail.com>"
-      to, // Recipient's email
-      subject, // Email subject
-      text, // Plain text body
+      to,
+      cc: process.env.CC_EMAIL,
+      bcc: process.env.BCC_EMAIL,
+      subject,
+      text,
     };
 
     await transporter.sendMail(mailOptions);
