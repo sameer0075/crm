@@ -16,7 +16,6 @@ import { leadDetails } from '@/redux/slices/lead-slice';
 import { getLogs, clearLogs } from '@/redux/slices/logs-slice';
 import { getComments } from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
-import EmailBuilder from '../components/EmailBuilder';
 
 const Page = () => {
   const [details, setDetails] = useState(null);
@@ -117,7 +116,6 @@ const Page = () => {
           <div className="col-span-12 md:col-span-6 flex flex-col gap-4">
             <Stepper data={comments} />
             <CallActivity data={logsData} />
-
           </div>
           {/* Third Column */}
           <div className="col-span-12 md:col-span-3 flex flex-col gap-4">
@@ -127,7 +125,6 @@ const Page = () => {
             />
             <CalendarLogs data={phoneLogsData} />
             <ActivityLog data={comments} />
-
           </div>
         </div>
       </div>

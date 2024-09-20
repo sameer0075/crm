@@ -21,13 +21,14 @@ const CallNow = ({ totalComments, phone }: CallNowInterface) => {
   };
 
   return (
-    <div className="grid grid-cols-2 text-[16px] font-semibold rounded-lg bg-white p-4  justify-between items-center bg-gradient-to-br from-white via-transparent to-transparent shadow-lg shadow-gray-300">
+    <div className="text-[16px] font-semibold rounded-lg bg-white p-4 flex justify-between items-center bg-gradient-to-br from-white via-transparent to-transparent shadow-lg shadow-gray-300">
       <div
         onClick={handleClick}
-        className={`flex items-center ${totalComments === 0
-          ? 'cursor-not-allowed opacity-50'
-          : 'cursor-pointer'
-          }`}
+        className={`flex items-center ${
+          totalComments === 0
+            ? 'cursor-not-allowed opacity-50'
+            : 'cursor-pointer'
+        }`}
       >
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
