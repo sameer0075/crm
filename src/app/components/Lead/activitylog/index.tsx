@@ -24,7 +24,9 @@ const ActivityLog = ({ data }: CommentsInterface) => (
               key={index}
               className="relative w-full border-b border-[#D9D9D9] py-2"
             >
-              <h1 className="text-black text-[12px] pb-[4px] break-words">{log.comment}</h1>
+              <h1 className="text-black text-[12px] pb-[4px] break-words">
+                {log.comment}
+              </h1>
               <div className="grid grid-cols-2 justify-between  font-medium text-[#3673D4] text-[12px]">
                 <p className="font-semibold break-words">{datePart}</p>
                 <p className="font-semibold break-words">{timePart}</p>
@@ -33,7 +35,6 @@ const ActivityLog = ({ data }: CommentsInterface) => (
           );
         })}
       </div>
-
     </div>
   </section>
 );

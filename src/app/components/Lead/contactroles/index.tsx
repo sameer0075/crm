@@ -17,11 +17,11 @@ const ContactRoles = ({ data }: ContactRolesInterface) => {
           <h1 className="text-[10px]">Name</h1>
           <p className="text-[12px] break-words">{data?.fullName}</p>
         </div>
-        <div className=''>
+        <div className="">
           <h1 className="text-[10px]">Role</h1>
           <p className=" text-[12px] break-words">{data?.title}</p>
         </div>
-        <div className=''>
+        <div className="">
           <h1 className="text-[10px]">Phone</h1>
           <p className=" text-[12px] break-words">{data?.phone} </p>
         </div>
@@ -31,11 +31,6 @@ const ContactRoles = ({ data }: ContactRolesInterface) => {
         <p className="text-[#3673D4] text-[12px] break-words">{data?.email}</p>
       </div>
     </div>
-
-
-
-
   );
 };
 export default ContactRoles;
-

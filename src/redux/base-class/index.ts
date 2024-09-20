@@ -12,6 +12,9 @@ class API {
   constructor(baseURL: string) {
     this.instance = axios.create({
       baseURL,
+      headers: {
+        'ngrok-skip-browser-warning': 'true',
+      },
     });
 
     this.instance.interceptors.request.use(

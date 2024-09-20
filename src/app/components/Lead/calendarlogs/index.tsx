@@ -41,8 +41,10 @@ const CalendarLogs = ({ data }: LogsInterface) => {
                     step.type[0]?.toUpperCase() + step.type.slice(1)}
                 </h1>
                 <div className="grid grid-cols-12 justify-between  text-black text-[12px]">
-                  <p className='break-words col-span-8'>You logged a call</p>
-                  <p className='break-words col-span-4 text-end'>{step.callDuration ?? 'N/A'}</p>
+                  <p className="break-words col-span-8">You logged a call</p>
+                  <p className="break-words col-span-4 text-end">
+                    {step.callDuration ?? 'N/A'}
+                  </p>
                 </div>
               </div>
               <div
@@ -51,7 +53,6 @@ const CalendarLogs = ({ data }: LogsInterface) => {
             </div>
           ))}
         </div>
-
       </div>
     </section>
   );

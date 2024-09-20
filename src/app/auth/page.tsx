@@ -215,7 +215,9 @@ export default function Auth() {
               </div>
               {errors.password && (
                 <p className="text-red-500 text-sm">
-                  {_.startCase(_.toLower(errors.password))}
+                  {formData?.password?.length < 6
+                    ? errors.password
+                    : _.startCase(_.toLower(errors.password))}
                 </p>
               )}
             </div>

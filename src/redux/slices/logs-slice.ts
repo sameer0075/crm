@@ -45,6 +45,30 @@ export const getLogs = createAsyncThunk(
   }
 );
 
+export const sendMail = createAsyncThunk(
+  'logs/send/mail',
+  async (
+    data: {
+      id: string;
+      to: string;
+      subject: string;
+      text: string;
+      cc?: string;
+      bcc?: string;
+    },
+    thunkAPI
+  ) => {
+    try {
+      const { id, ...rest } = data;
+      const url = `${ActivityLogs.sendMail(id)}`;
+      const resp = await api.post(`${url}`, rest);
+      return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const clearLogs = createAsyncThunk(
   'logs/list/clear',
   async (thunkAPI) => {

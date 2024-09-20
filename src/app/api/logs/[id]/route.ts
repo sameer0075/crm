@@ -35,6 +35,9 @@ const ActivityLogsListHandler = async (
             is_active: true,
           },
         },
+        orderBy: {
+          createdAt: 'desc', // Replace 'createdAt' with the column you want to sort by
+        },
       });
     } else {
       logs = await prisma.activity_logs.findMany({
@@ -43,6 +46,9 @@ const ActivityLogsListHandler = async (
           record: {
             is_active: true,
           },
+        },
+        orderBy: {
+          createdAt: 'desc', // Replace 'createdAt' with the column you want to sort by
         },
       });
     }

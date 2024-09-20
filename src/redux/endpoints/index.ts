@@ -10,6 +10,7 @@ const LeadEndpoints = {
 
 const ActivityLogs = {
   logsList: (id: string, type?: string) => `/logs/${id}?type=${type ?? ''}`,
+  sendMail: (id: string) => `/logs/send-mail/${id}`,
 };
 
 const CommentsEndpoints = {

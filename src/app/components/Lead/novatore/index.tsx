@@ -1,10 +1,14 @@
 'use client';
 import React from 'react';
 
-const Novatore = () => {
+interface CompanyInterface {
+  company: string;
+}
+
+const Novatore = ({ company }: CompanyInterface) => {
   return (
     <div className="font-semibold rounded-lg bg-white p-4  bg-gradient-to-br from-white via-white to-transparent shadow-lg">
-      <h1>Novatore Solutions</h1>
+      <h1>{company}</h1>
     </div>
   );
 };

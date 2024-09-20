@@ -46,8 +46,8 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
     const mailOptions = {
       from: `${process.env.EMAIL_FROM_NAME} <${process.env.EMAIL_FROM_MAIL}>`, // "Danish <danishtest593@gmail.com>"
       to,
-      cc: process.env.CC_EMAIL,
-      bcc: process.env.BCC_EMAIL,
+      // cc: process.env.CC_EMAIL,
+      // bcc: process.env.BCC_EMAIL,
       subject,
       text,
     };
