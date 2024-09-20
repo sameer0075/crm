@@ -15,6 +15,13 @@ const commentsSchema = z.object({
     .refine((val) => val !== undefined, {
       message: 'Comment is required', // Custom message for undefined
     }),
+  status: z
+    .string()
+    .nonempty('Status is required')
+    .or(z.undefined()) // Allows undefined to be handled explicitly
+    .refine((val) => val !== undefined && val !== '', {
+      message: 'Status is required', // Custom message for undefined
+    }),
 });
 
 export { commentsSchema };

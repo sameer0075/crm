@@ -38,6 +38,7 @@ model role {
 model comments {
   id        String   @id @default(uuid()) @db.Uuid
   comment   String
+  status    String?
   userId    String   @db.Uuid
   recordId  String   @db.Uuid
   user      user     @relation(fields: [userId], references: [id]) // Many-to-one relation with User

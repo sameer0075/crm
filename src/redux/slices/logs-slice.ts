@@ -30,8 +30,6 @@ export interface LogsInterface {
 const initialState = {
   isLoading: <boolean>false,
   allLogs: <LogsInterface[]>[],
-  phoneLogs: <LogsInterface[]>[],
-  commentLogs: <LogsInterface[]>[],
 };
 
 export const getLogs = createAsyncThunk(
@@ -46,8 +44,20 @@ export const getLogs = createAsyncThunk(
     }
   }
 );
+
+export const clearLogs = createAsyncThunk(
+  'logs/list/clear',
+  async (thunkAPI) => {
+    try {
+      true;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 const logsSlice = createSlice({
-  name: 'leads',
+  name: 'logs',
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -61,6 +71,27 @@ const logsSlice = createSlice({
       })
       .addCase(
         getLogs.rejected,
+        (state, action: { payload: { message: string } }) => {
+          if (action.payload.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action.payload.message);
+          state.isLoading = false;
+        }
+      )
+
+      .addCase(clearLogs.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(clearLogs.fulfilled, (state) => {
+        state.isLoading = false;
+        state.allLogs = [];
+      })
+      .addCase(
+        clearLogs.rejected,
         (state, action: { payload: { message: string } }) => {
           if (action.payload.message === 'Unauthorized') {
             sessionStorage.removeItem('token');

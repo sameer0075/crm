@@ -1,13 +1,27 @@
 'use client';
 import React from 'react';
 
-const CallNow = () => {
+interface CallNowInterface {
+  totalComments: number;
+  phone: number;
+}
+
+const CallNow = ({ totalComments, phone }: CallNowInterface) => {
   const handleClick = () => {
-    window.open('openphone://dial?number=8002752273');
+    if (totalComments > 0) {
+      window.open(`openphone://dial?number=${phone}`);
+    }
   };
   return (
     <div className="text-[16px] font-semibold rounded-lg bg-white p-4 flex justify-between items-center bg-gradient-to-br from-white via-transparent to-transparent shadow-lg shadow-gray-300">
-      <div onClick={handleClick} className="flex items-center cursor-pointer">
+      <div
+        onClick={handleClick}
+        className={`flex items-center ${
+          totalComments === 0
+            ? 'cursor-not-allowed opacity-50'
+            : 'cursor-pointer'
+        }`}
+      >
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"

@@ -12,6 +12,11 @@ const CallActivity = ({ data }: LogsInterface) => {
         <h2 className="text-lg font-semibold text-[#3673D4] pb-[12px]">
           Activity
         </h2>
+        {data?.length === 0 && (
+          <p className="text-[#111] pt-2 text-center font-medium text-xs font-roboto">
+            No Data Found
+          </p>
+        )}
         <div className="flex flex-col relative">
           {data?.map((step, index) => (
             <div key={index} className="flex items-center mb-6 relative ">

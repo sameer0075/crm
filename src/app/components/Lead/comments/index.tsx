@@ -4,6 +4,7 @@ import { useSearchParams } from 'next/navigation';
 
 import { CommentsInterface, addComment } from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
+import { toast } from 'react-toastify';
 
 import TextArea from '../../TextArea';
 import Select from '../../Select';
@@ -11,6 +12,7 @@ import Button from '../../Button';
 
 const Lead = ({ data }: CommentsInterface[]) => {
   const [comment, setComment] = useState<string>('');
+  const [status, setStatus] = useState<string>('');
   const details = useSelector((state) => state.leads.details);
   const loading = useSelector((state) => state.comments.isLoading);
   const dispatch = useDispatch<AppDispatch>();
@@ -21,12 +23,20 @@ const Lead = ({ data }: CommentsInterface[]) => {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
   };
+
+  const handleStatus = (e: ChangeEvent<HTMLInputElement>) => {
+    setStatus(e.target.value);
+  };
   const handleSubmit = () => {
-    // window.open('openphone://dial?number=8002752273');
+    if (!status) {
+      toast.error('Status is required!');
+      return;
+    }
     dispatch(
       addComment({
         comment,
         recordId: id,
+        status,
       })
     ).then(() => {
       setComment('');
@@ -84,6 +94,11 @@ const Lead = ({ data }: CommentsInterface[]) => {
         <p className="text-[#3673D4] font-medium text-xs font-roboto pt-4">
           Guidance for Success
         </p>
+        {data?.length === 0 && (
+          <p className="text-[#111] pt-2 text-center font-medium text-xs font-roboto">
+            No Data Found
+          </p>
+        )}
         <ul className="list-disc px-5 py-4">
           {data?.map((comment: CommentsInterface, index: number) => {
             return (
@@ -104,7 +119,19 @@ const Lead = ({ data }: CommentsInterface[]) => {
             >
               Comments
             </label>
-            <Select />
+            <Select
+              options={[
+                'Connected and Email Sent',
+                `Didn't Connect`,
+                'Follow Up',
+                'Voicemail',
+                'Referred to Another Person',
+                'Out of Office',
+                'Not the Right Person',
+                'Receptionist',
+              ]}
+              handleChange={handleStatus}
+            />
           </div>
 
           <TextArea

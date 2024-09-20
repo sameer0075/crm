@@ -10,6 +10,11 @@ const CalendarLogs = ({ data }: LogsInterface) => {
             September 2024
           </h1>
         </div>
+        {data?.length === 0 && (
+          <p className="text-[#111] pt-2 text-center font-medium text-xs font-roboto">
+            No Data Found
+          </p>
+        )}
         <div className="flex flex-col relative pt-4">
           {data.map((step, index) => (
             <div key={index} className="flex items-center mb-6 relative">

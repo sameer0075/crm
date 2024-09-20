@@ -51,7 +51,6 @@ const commentSlice = createSlice({
         state.isLoading = true;
       })
       .addCase(getComments.fulfilled, (state, action) => {
-        console.log('data in comment');
         state.isLoading = false;
         state.data = action.payload.data;
       })
@@ -74,7 +73,7 @@ const commentSlice = createSlice({
       })
       .addCase(addComment.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.data = [action.payload.data, ...state.data];
+        state.data = [...state.data, action.payload.data];
       })
       .addCase(
         addComment.rejected,

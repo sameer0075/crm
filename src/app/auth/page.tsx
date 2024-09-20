@@ -54,18 +54,42 @@ export default function Auth() {
    *
    * @param {ChangeEvent<HTMLInputElement>} e - The change event.
    */
+  // const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  //   const { name, value } = e.target;
+  //   setFormData((prevData: FormData) => ({
+  //     ...prevData,
+  //     [name]: value,
+  //   }));
+  //   const validationValue =
+  //     value.length > 0
+  //       ? name === 'email' && !validateEmail(value)
+  //         ? 'Invalid email!'
+  //         : ``
+  //       : `${name} is required`;
+  //   setErrors((prevData: FormData) => ({
+  //     ...prevData,
+  //     [name]: validationValue,
+  //   }));
+  // };
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     setFormData((prevData: FormData) => ({
       ...prevData,
       [name]: value,
     }));
-    const validationValue =
-      value.length > 0
-        ? name === 'email' && !validateEmail(value)
-          ? 'Invalid email!'
-          : ``
-        : `${name} is required`;
+
+    let validationValue = '';
+
+    if (value.length === 0) {
+      validationValue = `${name} is required`; // Field is required
+    } else if (name === 'email' && !validateEmail(value)) {
+      validationValue = 'Invalid email!'; // Invalid email format
+    } else if (name === 'password' && value.length < 6) {
+      validationValue = 'Password must be at least 6 characters long'; // Password length check
+    }
+
     setErrors((prevData: FormData) => ({
       ...prevData,
       [name]: validationValue,
@@ -76,6 +100,10 @@ export default function Auth() {
     const newErrors: FormData = { email: '', password: '' };
     if (!formData.password) {
       newErrors.password = 'password is required';
+    }
+
+    if (formData.password && formData.password.length < 6) {
+      newErrors.password = 'Password must be atleast 6 characters long.';
     }
 
     if (!formData.email) {
@@ -96,11 +124,7 @@ export default function Auth() {
   const handleClick = () => {
     const validation = validateForm();
     if (validation) {
-      dispatch(login(formData)).then(() => {
-        setTimeout(() => {
-          router.push('/leads');
-        }, 1500);
-      });
+      dispatch(login(formData));
     }
   };
 
@@ -188,12 +212,12 @@ export default function Auth() {
                     <EyeIcon className="w-5 h-5" />
                   )}
                 </button>
-                {errors.password && (
-                  <p className="text-red-500 text-sm">
-                    {_.startCase(_.toLower(errors.password))}
-                  </p>
-                )}
               </div>
+              {errors.password && (
+                <p className="text-red-500 text-sm">
+                  {_.startCase(_.toLower(errors.password))}
+                </p>
+              )}
             </div>
             <div className="flex items-center space-x-2">
               <input
