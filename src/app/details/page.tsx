@@ -113,7 +113,7 @@ const Page = () => {
             <CallNow />
             <CalendarLogs data={phoneLogsData} />
             <ActivityLog data={comments} />
-            <EmailBuilder />
+
           </div>
         </div>
       </div>

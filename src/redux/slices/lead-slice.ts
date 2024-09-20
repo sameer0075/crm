@@ -141,9 +141,9 @@ const leadsSlice = createSlice({
         (state, action: { payload: { message: string } }) => {
           if (action?.payload?.message === 'Unauthorized') {
             sessionStorage.removeItem('token');
-            // setTimeout(() => {
-            //   window.location.href = '/';
-            // }, 2000);
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
             toast.error(action.payload.message);
           }
           state.isLoading = false;
