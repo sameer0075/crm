@@ -6,7 +6,9 @@ import { LogsInterface } from '@/redux/slices/logs-slice';
 const CallActivity = ({ data }: LogsInterface) => {
   return (
     <section>
-      <div className="rounded-lg bg-gradient-to-br from-white via-white to-transparent shadow-lg h-[400px] p-4 overflow-auto">
+      <div
+        className={`rounded-lg bg-gradient-to-br from-white via-white to-transparent shadow-lg ${data?.length > 0 ? 'h-[400px]' : 'h-auto'} p-4 overflow-auto`}
+      >
         <h2 className="text-lg font-semibold text-[#3673D4] pb-[12px]">
           Activity
         </h2>
