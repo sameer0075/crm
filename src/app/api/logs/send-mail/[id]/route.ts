@@ -76,7 +76,7 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
     });
 
     const emailData = {
-      sender: { email: 'sameerbutt151@gmail.com' },
+      sender: { email: process.env.EMAIL_FROM },
       to: JSON.parse(to)?.map((email: string) => ({ email })),
       cc:
         JSON.parse(cc)?.length > 0
