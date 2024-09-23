@@ -21,6 +21,7 @@
     "@ant-design/icons": "^5.4.0",
     "@prisma/client": "^5.19.1",
     "@reduxjs/toolkit": "^2.2.7",
+    "@tinymce/tinymce-react": "^5.1.1",
     "axios": "^1.7.7",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
@@ -42,6 +43,7 @@
     "react-redux": "^9.1.2",
     "react-toastify": "^10.0.5",
     "redux": "^5.0.1",
+    "tinymce": "^7.3.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

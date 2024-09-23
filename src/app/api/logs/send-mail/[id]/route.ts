@@ -91,7 +91,7 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       cc: JSON.parse(cc ?? '[]'),
       bcc: JSON.parse(bcc ?? '[]'),
       subject: subject,
-      text: text,
+      html: text,
       attachments: await Promise.all(
         attachments.map(async (file: File) => {
           const content = await file.arrayBuffer();

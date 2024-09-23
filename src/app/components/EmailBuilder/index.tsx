@@ -3,7 +3,9 @@ import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 
 import { toast } from 'react-toastify';
+import { Editor } from '@tinymce/tinymce-react';
 import { X } from 'lucide-react';
+
 import { sendMail } from '@/redux/slices/logs-slice';
 import Button from '../Button';
 
@@ -137,6 +139,14 @@ const EmailComposer: React.FC = () => {
     }
   };
 
+  const customFileUploadButton = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '*/*'; // Adjust the file types as needed
+    input.onchange = handleFileChange;
+    input.click();
+  };
+
   if (!isVisible) return null;
 
   return (
@@ -145,12 +155,21 @@ const EmailComposer: React.FC = () => {
         <div
           className={`${
             isMinimized
-              ? 'h-[600px]  '
+              ? 'h-[600px]'
               : isFullScreen
-                ? 'w-[1000px] h-[600px] '
+                ? 'w-[1000px] h-[600px]'
                 : 'max-w-[600px] w-[600px]'
-          } fixed mx-auto bg-white shadow-lg rounded-lg mt-10 border ${isFullScreen ? ' top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 ' : 'bottom-0 right-4'}  transition-all  duration-300`}
-          style={{ zIndex: 1000, height: '600px' }}
+          } fixed mx-auto bg-white shadow-lg rounded-lg mt-10 border ${
+            isFullScreen
+              ? 'top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2'
+              : 'bottom-0 right-4'
+          } transition-all duration-300`}
+          style={{
+            zIndex: 1000,
+            height: 'auto',
+            maxHeight: '600px',
+            overflowY: 'auto',
+          }} // Adjust this line
         >
           {/* Header  */}
           <div className="border-b p-2 flex justify-between items-center bg-[#424242] rounded-tl-[8px] rounded-br-none rounded-tr-[8px] rounded-bl-none">
@@ -330,15 +349,39 @@ const EmailComposer: React.FC = () => {
               />
             </div>
             {/* Body Input */}
-            <div className="flex-grow">
-              <textarea
-                id="body"
-                className="w-full h-full resize-none focus:outline-none"
-                rows={5}
-                placeholder="Email here"
+            <div className="flex-grow mt-8">
+              <Editor
+                apiKey={process.env.NEXT_PUBLIC_EDITOR_API_KEY}
                 value={body}
-                onChange={(e) => setBody(e.target.value)}
-                onFocus={handleFocusOnSubjectOrBody}
+                onEditorChange={(newBody) => setBody(newBody)}
+                init={{
+                  height: 300, // Adjust height as needed
+                  menubar: false,
+                  plugins: 'lists link',
+                  toolbar:
+                    'undo redo | formatselect | bold italic | alignleft aligncenter alignright | bullist numlist | link preview | customFileUpload', // Include your custom button here
+                  content_style:
+                    'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }',
+                  setup: (editor) => {
+                    // Add your custom button
+                    editor.ui.registry.addButton('customFileUpload', {
+                      tooltip: 'Add File',
+                      icon: 'upload',
+                      onAction: () => {
+                        // Call your custom file upload logic here
+                        customFileUploadButton();
+                      },
+                    });
+                  },
+                }}
+                textareaName="body"
+                inline={false}
+                style={{
+                  width: '100%',
+                  border: '1px solid #ccc',
+                  borderRadius: '4px',
+                  boxSizing: 'border-box',
+                }}
               />
             </div>
             <div className="w-full resize-none focus:outline-none max-h-[200px] overflow-auto">
@@ -375,29 +418,6 @@ const EmailComposer: React.FC = () => {
                   loading={loading}
                   disabled={to?.length > 0 && body != '' ? false : true}
                 />
-                <div className="flex space-x-2">
-                  <label className="flex items-center cursor-pointer">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <path
-                        d="M16.1248 6.49984V17.0415C16.1248 19.0673 14.484 20.7082 12.4582 20.7082C10.4323 20.7082 8.7915 19.0673 8.7915 17.0415V5.58317C8.7915 4.31817 9.81817 3.2915 11.0832 3.2915C12.3482 3.2915 13.3748 4.31817 13.3748 5.58317V15.2082C13.3748 15.7123 12.9623 16.1248 12.4582 16.1248C11.954 16.1248 11.5415 15.7123 11.5415 15.2082V6.49984H10.1665V15.2082C10.1665 16.4732 11.1932 17.4998 12.4582 17.4998C13.7232 17.4998 14.7498 16.4732 14.7498 15.2082V5.58317C14.7498 3.55734 13.109 1.9165 11.0832 1.9165C9.05734 1.9165 7.4165 3.55734 7.4165 5.58317V17.0415C7.4165 19.8282 9.6715 22.0832 12.4582 22.0832C15.2448 22.0832 17.4998 19.8282 17.4998 17.0415V6.49984H16.1248Z"
-                        fill="black"
-                        fillOpacity="0.54"
-                      />
-                    </svg>
-                    <input
-                      type="file"
-                      multiple
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
-                </div>
               </div>
               <button onClick={handleDelete}>
                 <svg
