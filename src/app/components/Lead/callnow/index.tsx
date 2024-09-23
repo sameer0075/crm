@@ -47,7 +47,10 @@ const CallNow = ({ totalComments, phone }: CallNowInterface) => {
 
         <h1 className="text-[14px] font-semibold ml-2">Call Now</h1>
       </div>
-      <div className="flex items-center " onClick={handleBoxClick}>
+      <div
+        className="flex items-center cursor-pointer"
+        onClick={handleBoxClick}
+      >
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
             xmlns="http://www.w3.org/2000/svg"

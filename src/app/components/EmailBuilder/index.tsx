@@ -42,13 +42,6 @@ const EmailComposer: React.FC = () => {
     }
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files) {
-      const files = Array.from(e.target.files);
-      setAttachments((prev) => [...prev, ...files]);
-    }
-  };
-
   const handleEmailRemove = (
     emailToRemove: string,
     setEmails: React.Dispatch<React.SetStateAction<string[]>>,
@@ -67,17 +60,48 @@ const EmailComposer: React.FC = () => {
     setLoading(true);
     console.log({
       to,
-      //   cc,
-      //   bcc,
+      cc,
+      bcc,
       subject,
       body,
       attachments,
     });
 
+    const payload = {
+      to,
+      cc,
+      bcc,
+      subject,
+      body,
+      attachments,
+    };
+
+    const formData = new FormData();
+    // payload.to.forEach((email, index) => {
+    //   formData.append(`to[${index}]`, email);
+    // });
+    console.log('to', to);
+    formData.append(`to`, JSON.stringify(to));
+
+    payload.cc.forEach((email, index) => {
+      formData.append(`cc[${index}]`, email);
+    });
+
+    payload.bcc.forEach((email, index) => {
+      formData.append(`bcc[${index}]`, email);
+    });
+
+    // Append subject and body
+    formData.append('subject', payload.subject);
+    formData.append('body', payload.body);
+
+    // Append each file in attachments
+    attachments.forEach((file) => {
+      formData.append('attachments', file);
+    });
+
     if (to?.length > 0 && body != '') {
-      dispatch(
-        sendMail({ id, to: to[0], subject, text: body, cc: cc[0], bcc: bcc[0] })
-      )
+      dispatch(sendMail({ id, data: formData }))
         .then(() => {
           toast.info('Email Sent Successfully');
           setLoading(false);
@@ -98,6 +122,12 @@ const EmailComposer: React.FC = () => {
     setBody('');
     setAttachments([]);
     setIsVisible(false);
+  };
+
+  const removeFile = (index: number) => {
+    setAttachments((prevAttachments) =>
+      prevAttachments.filter((_, i) => i !== index)
+    );
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -311,6 +341,29 @@ const EmailComposer: React.FC = () => {
                 onFocus={handleFocusOnSubjectOrBody}
               />
             </div>
+            <div className="w-full resize-none focus:outline-none max-h-[200px] overflow-auto">
+              {attachments?.map((file, index: number) => {
+                console.log('file', file);
+                return (
+                  <div
+                    key={index}
+                    className=" bg-[#eeeeee] m-2 p-2 rounded flex justify-between items-center"
+                  >
+                    <span className="text-sm font-[12px]">
+                      {file.name.length > 30
+                        ? file.name.slice(0, 30) + '...'
+                        : file.name}
+                    </span>
+                    <div
+                      className="cursor-pointer"
+                      onClick={() => removeFile(index)}
+                    >
+                      <X size={16} />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
             {/* Footer  */}
             <div className=" p-2 flex justify-between mb-10">
               <div className="flex space-x-4">
@@ -341,28 +394,6 @@ const EmailComposer: React.FC = () => {
                       type="file"
                       multiple
                       onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
-                  <label className="flex items-center cursor-pointer">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                    >
-                      <path
-                        d="M20.25 18.4167V5.58333C20.25 4.575 19.425 3.75 18.4167 3.75H5.58333C4.575 3.75 3.75 4.575 3.75 5.58333V18.4167C3.75 19.425 4.575 20.25 5.58333 20.25H18.4167C19.425 20.25 20.25 19.425 20.25 18.4167ZM8.79167 13.375L11.0833 16.1342L14.2917 12L18.4167 17.5H5.58333L8.79167 13.375Z"
-                        fill="black"
-                        fillOpacity="0.54"
-                      />
-                    </svg>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageChange}
                       className="hidden"
                     />
                   </label>

@@ -50,18 +50,15 @@ export const sendMail = createAsyncThunk(
   async (
     data: {
       id: string;
-      to: string;
-      subject: string;
-      text: string;
-      cc?: string;
-      bcc?: string;
+      data: FormData;
     },
     thunkAPI
   ) => {
     try {
-      const { id, ...rest } = data;
-      const url = `${ActivityLogs.sendMail(id)}`;
-      const resp = await api.post(`${url}`, rest);
+      console.log('in slice', data);
+      const url = `${ActivityLogs.sendMail(data.id)}`;
+      const resp = await api.post(`${url}`, data.data);
+      console.log('resp', resp);
       return resp;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
