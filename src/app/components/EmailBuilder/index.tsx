@@ -84,14 +84,8 @@ const EmailComposer: React.FC = () => {
     // });
     console.log('to', to);
     formData.append(`to`, JSON.stringify(to));
-
-    payload.cc.forEach((email, index) => {
-      formData.append(`cc[${index}]`, email);
-    });
-
-    payload.bcc.forEach((email, index) => {
-      formData.append(`bcc[${index}]`, email);
-    });
+    formData.append(`cc`, JSON.stringify(cc));
+    formData.append(`bcc`, JSON.stringify(bcc));
 
     // Append subject and body
     formData.append('subject', payload.subject);
@@ -102,7 +96,7 @@ const EmailComposer: React.FC = () => {
       formData.append('attachments', file);
     });
 
-    if (to?.length > 0 && body != '') {
+    if (to?.length > 0 && body != '' && subject != '') {
       dispatch(sendMail({ id, data: formData }))
         .then(() => {
           toast.info('Email Sent Successfully');
@@ -132,10 +126,46 @@ const EmailComposer: React.FC = () => {
     );
   };
 
+  const validateFileExtension = (fileName: string): boolean => {
+    const supportedFileExtensions = [
+      'pdf',
+      'doc',
+      'docx',
+      'xls',
+      'xlsx',
+      'ppt',
+      'pptx',
+      'txt',
+      'jpg',
+      'jpeg',
+      'png',
+      'gif',
+      'bmp',
+      'zip',
+      'rar',
+      'csv',
+      'ics',
+    ];
+
+    const fileExtension = fileName.split('.').pop()?.toLowerCase(); // Get the file extension
+    return supportedFileExtensions.includes(fileExtension || '');
+  };
+
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const files = Array.from(e.target.files);
-      setAttachments((prev) => [...prev, ...files]);
+      const validFiles = files.filter((file) =>
+        validateFileExtension(file.name)
+      );
+      if (validFiles.length < files.length) {
+        toast.error(
+          'One or more files have unsupported extensions. Please upload valid files.'
+        );
+      }
+
+      if (validFiles.length > 0) {
+        setAttachments((prev) => [...prev, ...validFiles]);
+      }
     }
   };
 
@@ -409,15 +439,27 @@ const EmailComposer: React.FC = () => {
             </div>
             {/* Footer  */}
             <div className=" p-2 flex justify-between mb-10">
-              <div className="flex space-x-4">
-                <Button
-                  handleClick={handleSend}
-                  className={`bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-4 rounded ${to?.length < 0 && body == '' ? 'opacity-50' : ''}`}
-                  text="Send"
-                  type="button"
-                  loading={loading}
-                  disabled={to?.length > 0 && body != '' ? false : true}
-                />
+              <div>
+                <div className="flex space-x-4">
+                  <Button
+                    handleClick={handleSend}
+                    className={`bg-blue-500 hover:bg-blue-600 text-white font-medium py-1 px-4 rounded ${to?.length == 0 || body == '' || subject === '' ? 'opacity-50' : ''}`}
+                    text="Send"
+                    type="button"
+                    loading={loading}
+                    disabled={
+                      to?.length > 0 && body != '' && subject != ''
+                        ? false
+                        : true
+                    }
+                  />
+                </div>
+                <p>
+                  <span className="text-sm text-[red]">Note:</span>{' '}
+                  <span className="text-sm text-[#777777]">
+                    Subject,Text Body & Recipients should not be empty
+                  </span>
+                </p>
               </div>
               <button onClick={handleDelete}>
                 <svg
