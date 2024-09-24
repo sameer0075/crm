@@ -23,8 +23,18 @@ model user {
   comments comments[]
   company   String?
   phone     String?
+  smtpSettings user_smtp_settings?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model user_smtp_settings {
+  id        String   @id @default(uuid()) @db.Uuid
+  email_name   String
+  email_from   String
+  email_password String
+  userId    String   @db.Uuid   @unique
+  user      user     @relation(fields: [userId], references: [id])
 }
 
 model role {

@@ -44,10 +44,22 @@ const signupHandler = async (req: NextRequest): Promise<NextResponse> => {
       email,
       password: hashedPassword,
       roleId,
+      phone: body.phone,
+      company: body.company,
     },
   });
 
   newUser = removeSensitiveFields(newUser, 'password');
+  const smptSettings = body.smtp;
+
+  if (smptSettings) {
+    await prisma.user_smtp_settings.create({
+      data: {
+        ...smptSettings,
+        userId: newUser.id,
+      },
+    });
+  }
 
   return NextResponse.json(
     {
