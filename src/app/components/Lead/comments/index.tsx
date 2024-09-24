@@ -77,9 +77,19 @@ const Lead = ({ data, appendLog }: Interface) => {
 
   useEffect(() => {
     if (details) {
-      const recordStatuses = statuses.filter(
-        () => details.type === 'LEAD' || details.type === 'FOLLOW_UP_LEAD'
-      );
+      let recordStatuses = [];
+      if (details.type === 'LEAD' || details.type === 'FOLLOW_UP_LEAD') {
+        recordStatuses = statuses.filter(
+          (info) =>
+            info.statusFor === 'LEAD' || info.statusFor === 'FOLLOW_UP_LEAD'
+        );
+      } else if (details.type === 'OPPORTUNITY') {
+        recordStatuses = statuses.filter(
+          (info) =>
+            info.statusFor === 'OPPORTUNITY' ||
+            info.statusFor === 'FOLLOW_UP_OPPORTUNITY'
+        );
+      }
       const currentStatus = statuses.find(
         (info) => info.id === details.recordStatusId
       );

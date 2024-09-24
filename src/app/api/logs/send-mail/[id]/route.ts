@@ -104,7 +104,6 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       ),
     };
 
-    console.log('mailOptions', mailOptions);
     await transporter.sendMail(mailOptions);
     JSON.parse(to).forEach(async (mail) => {
       const logPayload = {
@@ -122,6 +121,33 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       };
       await prisma.activity_logs.create({ data: logPayload });
     });
+
+    const callLogs = await prisma.activity_logs.count({
+      where: {
+        recordId: record?.id,
+        type: 'call',
+      },
+    });
+
+    if (callLogs !== 0) {
+      const recordStatus = await prisma.record_status.findFirst({
+        where: {
+          name: 'Connected & Email Sent',
+        },
+      });
+
+      if (recordStatus) {
+        await prisma.records.update({
+          where: {
+            id: record.id,
+          },
+          data: {
+            recordStatusId: recordStatus.id,
+            type: 'OPPORTUNITY',
+          },
+        });
+      }
+    }
 
     return NextResponse.json(
       {
