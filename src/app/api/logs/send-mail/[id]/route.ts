@@ -2,13 +2,13 @@ import { NextResponse, NextRequest } from 'next/server';
 
 import { ApiError } from 'next/dist/server/api-utils';
 import { v2 as cloudinary } from 'cloudinary';
+import nodemailer from 'nodemailer';
 
 import { globalErrorHandler } from '@/lib/error-handling/error-handler';
 import { PrismaClient } from '@prisma/client';
 import { StatusCode } from '@/utils/enums';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
-import { sendEmailWithBrevo } from '@/utils/strategies/brevo.strategy';
 const prisma = new PrismaClient();
 
 cloudinary.config({
@@ -75,34 +75,37 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       },
     });
 
-    const emailData = {
-      sender: { email: process.env.EMAIL_FROM },
-      to: JSON.parse(to)?.map((email: string) => ({ email })),
-      cc:
-        JSON.parse(cc)?.length > 0
-          ? JSON.parse(cc).map((email: string) => ({ email }))
-          : null,
-      bcc:
-        JSON.parse(bcc)?.length > 0
-          ? JSON.parse(bcc).map((email: string) => ({ email }))
-          : null,
-      subject,
-      htmlContent: text,
+    const transporter = nodemailer.createTransport({
+      host: process.env.EMAIL_HOST,
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.EMAIL_FROM,
+        pass: process.env.EMAIL_PASSWORD,
+      },
+    });
+
+    const mailOptions = {
+      from: `${process.env.EMAIL_NAME} <${process.env.EMAIL_FROM}>`,
+      to: JSON.parse(to),
+      cc: JSON.parse(cc ?? '[]'),
+      bcc: JSON.parse(bcc ?? '[]'),
+      subject: subject,
+      html: text,
+      attachments: await Promise.all(
+        attachments?.map(async (file: File) => {
+          const content = await file.arrayBuffer();
+          const buffer = Buffer.from(content);
+          return {
+            filename: file.name,
+            content: buffer,
+          };
+        })
+      ),
     };
 
-    if (attachmentUploads?.length > 0) {
-      emailData.attachment = attachmentUploads.map(
-        (file: { url: string }, index: number) => ({
-          url: file.url,
-          name:
-            attachments && attachments[index]?.name
-              ? attachments[index]?.name
-              : 'Email Attachment',
-        })
-      );
-    }
-    await sendEmailWithBrevo(emailData);
-
+    console.log('mailOptions', mailOptions);
+    await transporter.sendMail(mailOptions);
     JSON.parse(to).forEach(async (mail) => {
       const logPayload = {
         type: 'email',
@@ -128,6 +131,7 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       { status: StatusCode.success }
     );
   } catch (error) {
+    console.log(error);
     throw new ApiError(StatusCode.badrequest, error.message);
   }
 };
