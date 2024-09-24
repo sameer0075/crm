@@ -9,9 +9,13 @@ import { X } from 'lucide-react';
 import { sendMail } from '@/redux/slices/logs-slice';
 import Button from '../Button';
 
-const EmailComposer: React.FC = () => {
-  const [to, setTo] = useState<string[]>([]);
-  const [cc, setCc] = useState<string[]>([]);
+interface EmailComposerInterface {
+  email: string;
+}
+
+const EmailComposer: React.FC = ({ email }: EmailComposerInterface) => {
+  const [to, setTo] = useState<string[]>([email]);
+  const [cc, setCc] = useState<string[]>(['info@novatoresols.com']);
   const [bcc, setBcc] = useState<string[]>([]);
   const [subject, setSubject] = useState<string>('');
   const [body, setBody] = useState<string>('');
@@ -19,7 +23,7 @@ const EmailComposer: React.FC = () => {
   const [isMinimized, setIsMinimized] = useState<boolean>(false);
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
   const [isVisible, setIsVisible] = useState<boolean>(true);
-  const [showCc, setShowCc] = useState<boolean>(false);
+  const [showCc, setShowCc] = useState<boolean>(true);
   const [showBcc, setShowBcc] = useState<boolean>(false);
   const [showRecipientLabel, setShowRecipientLabel] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
@@ -79,10 +83,7 @@ const EmailComposer: React.FC = () => {
     };
 
     const formData = new FormData();
-    // payload.to.forEach((email, index) => {
-    //   formData.append(`to[${index}]`, email);
-    // });
-    console.log('to', to);
+
     formData.append(`to`, JSON.stringify(to));
     formData.append(`cc`, JSON.stringify(cc));
     formData.append(`bcc`, JSON.stringify(bcc));

@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useState } from 'react';
+import React, { ChangeEvent, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 import { CommentsInterface, addComment } from '@/redux/slices/commentSlice';
@@ -7,11 +7,21 @@ import { toast } from 'react-toastify';
 import TextArea from '../../TextArea';
 import Select from '../../Select';
 import Button from '../../Button';
-const Lead = ({ data }: CommentsInterface[]) => {
+import { StatusInterface } from '@/redux/slices/status-slice';
+
+interface Interface {
+  data: CommentsIterface[];
+  appendLog: () => void;
+}
+
+const Lead = ({ data, appendLog }: Interface) => {
   const [comment, setComment] = useState<string>('');
   const [status, setStatus] = useState<string>('');
+  const [statusOptions, setStatusOptions] = useState<StatusInterface[]>([]);
+  const [statusError, setStatusError] = useState<boolean>(false); // Error state for status
   const details = useSelector((state) => state.leads.details);
   const loading = useSelector((state) => state.comments.isLoading);
+  const statuses = useSelector((state) => state.status.data);
   const dispatch = useDispatch<AppDispatch>();
   const params = useSearchParams();
   const id = params.get('id');
@@ -20,22 +30,39 @@ const Lead = ({ data }: CommentsInterface[]) => {
   };
   const handleStatus = (e: ChangeEvent<HTMLInputElement>) => {
     setStatus(e.target.value);
+    setStatusError(false);
   };
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!status) {
+      setStatusError(true);
       toast.error('Status is required!');
       return;
     }
-    dispatch(
+    const res = await dispatch(
       addComment({
         comment,
         recordId: id,
         status,
       })
-    ).then(() => {
+    ).unwrap();
+    if (res.success) {
       setComment('');
-    });
+      appendLog(res.log);
+    }
   };
+
+  useEffect(() => {
+    if (details) {
+      const recordStatuses = statuses.filter(
+        (info) => info.statusFor === details.type
+      );
+      const currentStatus = statuses.find(
+        (info) => info.id === details.recordStatusId
+      );
+      setStatus(currentStatus?.id);
+      setStatusOptions(recordStatuses);
+    }
+  }, [details, statuses]);
   return (
     <div className="w-full flex justify-center px-4 sm:px-0">
       <div className="w-full sm:w-[500px] md:w-[600px] p-4 sm:p-6 lg:w-[670px] flex-shrink-0 ">
@@ -114,17 +141,10 @@ const Lead = ({ data }: CommentsInterface[]) => {
               Comments
             </label>
             <Select
-              options={[
-                'Connected and Email Sent',
-                `Didn't Connect`,
-                'Follow Up',
-                'Voicemail',
-                'Referred to Another Person',
-                'Out of Office',
-                'Not the Right Person',
-                'Receptionist',
-              ]}
+              options={statusOptions}
+              className={statusError ? 'border-red-500' : ''}
               handleChange={handleStatus}
+              value={status}
             />
           </div>
           <TextArea

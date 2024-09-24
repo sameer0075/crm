@@ -21,10 +21,10 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();
   try {
     const payload = commentsSchema.parse(body);
-
+    const { status, ...rest } = payload;
     const data = await prisma.comments.create({
       data: {
-        ...payload,
+        ...rest,
         userId: req.userId,
       },
     });
@@ -48,6 +48,14 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
     };
 
     const activityLog = await prisma.activity_logs.create({ data: logPayload });
+    await prisma.records.update({
+      where: {
+        id: rest.recordId,
+      },
+      data: {
+        recordStatusId: status,
+      },
+    });
 
     return NextResponse.json(
       {

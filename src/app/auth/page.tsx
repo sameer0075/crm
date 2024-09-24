@@ -49,29 +49,6 @@ export default function Auth() {
       );
   };
 
-  /**
-   * Handles changes to the form data.
-   *
-   * @param {ChangeEvent<HTMLInputElement>} e - The change event.
-   */
-  // const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   const { name, value } = e.target;
-  //   setFormData((prevData: FormData) => ({
-  //     ...prevData,
-  //     [name]: value,
-  //   }));
-  //   const validationValue =
-  //     value.length > 0
-  //       ? name === 'email' && !validateEmail(value)
-  //         ? 'Invalid email!'
-  //         : ``
-  //       : `${name} is required`;
-  //   setErrors((prevData: FormData) => ({
-  //     ...prevData,
-  //     [name]: validationValue,
-  //   }));
-  // };
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
@@ -83,7 +60,7 @@ export default function Auth() {
     let validationValue = '';
 
     if (value.length === 0) {
-      validationValue = `${name} is required`; // Field is required
+      validationValue = `${name[0]?.toUpperCase() + name.slice(1)} is required`; // Field is required
     } else if (name === 'email' && !validateEmail(value)) {
       validationValue = 'Invalid email!'; // Invalid email format
     } else if (name === 'password' && value.length < 6) {
@@ -99,7 +76,7 @@ export default function Auth() {
   const validateForm = () => {
     const newErrors: FormData = { email: '', password: '' };
     if (!formData.password) {
-      newErrors.password = 'password is required';
+      newErrors.password = 'Password is required';
     }
 
     if (formData.password && formData.password.length < 6) {
@@ -121,10 +98,15 @@ export default function Auth() {
   /**
    * Handles the button click.
    */
-  const handleClick = () => {
+  const handleClick = async () => {
     const validation = validateForm();
     if (validation) {
-      dispatch(login(formData));
+      const res = await dispatch(login(formData)).unwrap();
+      if (res && res.success) {
+        setTimeout(() => {
+          router.push('/leads');
+        }, 1500);
+      }
     }
   };
 

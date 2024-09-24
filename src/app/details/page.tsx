@@ -16,6 +16,7 @@ import { leadDetails } from '@/redux/slices/lead-slice';
 import { getLogs, clearLogs } from '@/redux/slices/logs-slice';
 import { getComments } from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
+import { getStatuses } from '@/redux/slices/status-slice';
 
 const Page = () => {
   const [details, setDetails] = useState(null);
@@ -38,6 +39,7 @@ const Page = () => {
         dispatch(leadDetails({ id })).unwrap(),
         dispatch(getComments({ id })).unwrap(),
         dispatch(getLogs({ id, type: 'all' })).unwrap(),
+        dispatch(getStatuses()).unwrap(),
       ])
         .then(() => {
           setLoading(false);
@@ -97,6 +99,10 @@ const Page = () => {
     };
   }, []);
 
+  const appendLog = (log) => {
+    setLogsData((prev) => [log, ...prev]); // Implicitly return a new array
+  };
+
   return (
     <section className="py-6 ">
       {loading && (
@@ -114,7 +120,7 @@ const Page = () => {
           </div>
           {/* Second Column */}
           <div className="col-span-12 md:col-span-6 flex flex-col gap-4">
-            <Stepper data={comments} />
+            <Stepper data={comments} appendLog={appendLog} />
             <CallActivity data={logsData} />
           </div>
           {/* Third Column */}
@@ -122,6 +128,7 @@ const Page = () => {
             <CallNow
               totalComments={comments?.length ?? 0}
               phone={details?.phone}
+              email={data?.email}
             />
             <CalendarLogs data={phoneLogsData} />
             <ActivityLog data={comments} />

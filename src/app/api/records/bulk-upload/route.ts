@@ -81,6 +81,11 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
         phone,
         lead_source,
       ] = row.values.slice(1);
+      const recordStatus = await prisma.record_status.findFirst({
+        where: {
+          name: 'Fresh',
+        },
+      });
       const payload = {
         company: String(company),
         website: String(website?.hyperlink),
@@ -99,6 +104,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
         lead_source,
         type: 'LEAD',
         status: 'ACTIVE',
+        recordStatusId: recordStatus?.id,
       };
 
       try {
@@ -154,6 +160,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
       { status: 200 }
     );
   } catch (error) {
+    console.log(error);
     throw new ApiError(StatusCode.internalservererror, error.message);
   } finally {
     const tempDir = join(process.cwd(), 'temp');

@@ -36,9 +36,9 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         sessionStorage.setItem('token', action.payload.token);
         toast.info(action.payload.message, 3000);
-        setTimeout(() => {
-          window.location.href = '/leads';
-        }, 1500);
+        // setTimeout(() => {
+        //   window.location.href = '/leads';
+        // }, 1500);
       })
       .addCase(login.rejected, (state, action) => {
         toast.error(action.payload.message);

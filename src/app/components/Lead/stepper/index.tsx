@@ -4,7 +4,12 @@ import { CommentsInterface } from '@/redux/slices/commentSlice';
 
 // # TODO: Replace SVG's with image tags
 
-const Stepper = ({ data }: CommentsInterface[]) => (
+interface StepperInterface {
+  data: CommentsInterface[];
+  appendLog: () => void;
+}
+
+const Stepper = ({ data, appendLog }: StepperInterface) => (
   <section className="">
     <div className="rounded-lg bg-gradient-to-br from-white  via-white to-transparent shadow-lg  p-4 flex flex-col ">
       <ol className="flex pt-20 max-w-[500px] min-w-[500px] w-full mx-auto ">
@@ -118,7 +123,7 @@ const Stepper = ({ data }: CommentsInterface[]) => (
           </span>
         </li>
       </ol>
-      <Lead data={data} />
+      <Lead data={data} appendLog={appendLog} />
     </div>
   </section>
 );

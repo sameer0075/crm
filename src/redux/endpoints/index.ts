@@ -18,4 +18,14 @@ const CommentsEndpoints = {
   addComment: () => `/comments/add`,
 };
 
-export { AuthEndpoints, LeadEndpoints, ActivityLogs, CommentsEndpoints };
+const StatusEndpoints = {
+  statusList: () => `/status/list`,
+};
+
+export {
+  AuthEndpoints,
+  LeadEndpoints,
+  ActivityLogs,
+  CommentsEndpoints,
+  StatusEndpoints,
+};

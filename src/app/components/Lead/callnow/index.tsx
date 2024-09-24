@@ -4,14 +4,21 @@ import EmailBuilder from '../../EmailBuilder';
 
 interface CallNowInterface {
   totalComments: number;
-  phone: number;
+  phone: string;
+  email: string;
 }
 
-const CallNow = ({ totalComments, phone }: CallNowInterface) => {
+const CallNow = ({ totalComments, phone, email }: CallNowInterface) => {
   const [emailBuilders, setEmailBuilders] = useState<number[]>([]);
+  const [tooltip, setTooltip] = useState<{
+    type: string;
+    visible: boolean;
+  } | null>(null);
 
   const handleBoxClick = () => {
-    setEmailBuilders([...emailBuilders, emailBuilders.length]); // Add a new instance
+    if (totalComments > 0) {
+      setEmailBuilders([...emailBuilders, emailBuilders.length]); // Add a new instance
+    }
   };
 
   const handleClick = () => {
@@ -20,10 +27,20 @@ const CallNow = ({ totalComments, phone }: CallNowInterface) => {
     }
   };
 
+  const showTooltip = (type: string) => {
+    setTooltip({ type, visible: true });
+  };
+
+  const hideTooltip = () => {
+    setTooltip(null);
+  };
+
   return (
-    <div className="text-[16px] font-semibold rounded-lg bg-white p-4 flex justify-between items-center bg-gradient-to-br from-white via-transparent to-transparent shadow-lg shadow-gray-300">
+    <div className="text-[16px] font-semibold rounded-lg bg-white p-4 flex justify-between items-center bg-gradient-to-br from-white via-transparent to-transparent shadow-lg shadow-gray-300 relative">
       <div
         onClick={handleClick}
+        onMouseEnter={() => showTooltip('call')}
+        onMouseLeave={hideTooltip}
         className={`flex items-center ${
           totalComments === 0
             ? 'cursor-not-allowed opacity-50'
@@ -44,12 +61,14 @@ const CallNow = ({ totalComments, phone }: CallNowInterface) => {
             />
           </svg>
         </div>
-
         <h1 className="text-[14px] font-semibold ml-2">Call Now</h1>
       </div>
+
       <div
-        className="flex items-center cursor-pointer"
         onClick={handleBoxClick}
+        onMouseEnter={() => showTooltip('email')}
+        onMouseLeave={hideTooltip}
+        className={`flex items-center ${totalComments === 0 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
       >
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
@@ -65,11 +84,33 @@ const CallNow = ({ totalComments, phone }: CallNowInterface) => {
             />
           </svg>
         </div>
-
         <h1 className="text-[14px] font-semibold ml-2">Email Now</h1>
       </div>
+
+      {tooltip && (
+        <div
+          className={`absolute z-10 inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm ${tooltip.visible ? 'opacity-100' : 'opacity-0'}`}
+          style={{
+            top: tooltip.type === 'call' ? '15px' : '15px', // Adjust to place the tooltip above the buttons
+            left: tooltip.type === 'call' ? '0%' : '50%', // Center align horizontally
+            transform: 'translate(-50%, -100%)', // Adjust to center horizontally and move above
+          }}
+        >
+          {tooltip.type === 'call'
+            ? totalComments === 0
+              ? 'Make a comment to enable call'
+              : 'Make a call'
+            : totalComments === 0
+              ? 'Make a comment to enable email'
+              : 'Send email'}
+          <div className="tooltip-arrow" data-popper-arrow></div>
+        </div>
+      )}
+
       {emailBuilders.map((_, index) => (
-        <EmailBuilder key={index} />
+        <div key={index}>
+          <EmailBuilder email={email} />
+        </div>
       ))}
     </div>
   );

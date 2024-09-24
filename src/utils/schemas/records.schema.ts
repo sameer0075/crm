@@ -24,6 +24,7 @@ const recordsSchema = z.object({
   website: z.string().nonempty('Website is required'),
   company: z.string().nonempty('Company is required'),
   phone: z.string().nonempty('Phone is required'),
+  recordStatusId: z.string().nonempty('Record Status Id is required'),
   date: z.date().optional(),
   stage: stageEnum.optional(),
   city: z.string().optional(),
