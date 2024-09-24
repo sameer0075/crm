@@ -45,6 +45,13 @@ enum RoleEnums {
   MANAGER = 'manager',
 }
 
-const RecordsEnum = ['LEAD', 'OPPORTUNITY', 'APPOINTMENT', 'DEAL'];
+const RecordsEnum = [
+  'LEAD',
+  'FOLLOW_UP_LEAD',
+  'OPPORTUNITY',
+  'FOLLOW_UP_OPPORTUNITY',
+  'APPOINTMENT',
+  'DEAL',
+];
 
 export { errorHanlderEnum, StatusCode, RecordsEnum, RoleEnums };

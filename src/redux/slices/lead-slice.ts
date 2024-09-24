@@ -30,12 +30,29 @@ interface RecordsInterface {
 const initialState = {
   isLoading: <boolean>false,
   data: <RecordsInterface[]>null,
+  followUpData: <RecordsInterface[]>null,
   count: <number>0,
+  followUpCount: <number>0,
   details: <RecordsInterface>null,
 };
 
 export const getLeads = createAsyncThunk(
   'leads/list',
+  async (data: { type: string; page: number; pageSize: number }, thunkAPI) => {
+    try {
+      const url = `${LeadEndpoints.leadsList(data.type)}`;
+      const resp = await api.get(
+        `${url}?page=${data.page}&pageSize=${data.pageSize}`
+      );
+      return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const getFollowUpLeads = createAsyncThunk(
+  'follow-up-leads/list',
   async (data: { type: string; page: number; pageSize: number }, thunkAPI) => {
     try {
       const url = `${LeadEndpoints.leadsList(data.type)}`;
@@ -91,6 +108,28 @@ const leadsSlice = createSlice({
       })
       .addCase(
         getLeads.rejected,
+        (state, action: { payload: { message: string } }) => {
+          if (action.payload.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action.payload.message);
+          state.isLoading = false;
+        }
+      )
+
+      .addCase(getFollowUpLeads.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getFollowUpLeads.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.followUpData = action.payload.data;
+        state.followUpCount = action.payload.totalCount;
+      })
+      .addCase(
+        getFollowUpLeads.rejected,
         (state, action: { payload: { message: string } }) => {
           if (action.payload.message === 'Unauthorized') {
             sessionStorage.removeItem('token');

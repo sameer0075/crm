@@ -11,7 +11,6 @@ export const openPhoneMiddleware = async (
     const headersList = req.headers;
     const signature = headersList.get('openphone-signature');
     const secret = process.env.OPEN_PHONE_SECRET;
-    console.log('signature', signature);
     if (!signature) {
       return NextResponse.json(
         {

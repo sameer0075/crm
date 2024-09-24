@@ -1,10 +1,20 @@
 import { z } from 'zod';
 
 const typeEnum = z
-  .enum(['LEAD', 'OPPORTUNITY', 'APPOINTMENT', 'DEAL'], {
-    required_error: 'Type is required', // Custom error message for required fields
-    invalid_type_error: 'Invalid Type',
-  })
+  .enum(
+    [
+      'LEAD',
+      'FOLLOW_UP_LEAD',
+      'OPPORTUNITY',
+      'FOLLOW_UP_OPPORTUNITY',
+      'APPOINTMENT',
+      'DEAL',
+    ],
+    {
+      required_error: 'Type is required', // Custom error message for required fields
+      invalid_type_error: 'Invalid Type',
+    }
+  )
   .optional();
 const leadSourceEnum = z
   .enum(['EMAIL', 'PHONE', 'BOTH'], {

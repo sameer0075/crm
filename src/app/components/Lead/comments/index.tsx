@@ -1,7 +1,12 @@
 import React, { ChangeEvent, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
-import { CommentsInterface, addComment } from '@/redux/slices/commentSlice';
+import {
+  CommentsInterface,
+  addComment,
+  handleDisablePhone,
+  handleDisableEmail,
+} from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
 import { toast } from 'react-toastify';
 import TextArea from '../../TextArea';
@@ -25,12 +30,28 @@ const Lead = ({ data, appendLog }: Interface) => {
   const dispatch = useDispatch<AppDispatch>();
   const params = useSearchParams();
   const id = params.get('id');
+
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
   };
+
   const handleStatus = (e: ChangeEvent<HTMLInputElement>) => {
     setStatus(e.target.value);
     setStatusError(false);
+  };
+
+  const handleStatusDisability = (statusData) => {
+    if (statusData) {
+      if (statusData.name === 'Fresh') {
+        dispatch(handleDisablePhone({ disable: true }));
+        dispatch(handleDisableEmail({ disable: true }));
+      } else if (statusData.name === 'Pre Research') {
+        dispatch(handleDisablePhone({ disable: false }));
+      } else {
+        dispatch(handleDisablePhone({ disable: false }));
+        dispatch(handleDisableEmail({ disable: false }));
+      }
+    }
   };
   const handleSubmit = async () => {
     if (!status) {
@@ -46,21 +67,25 @@ const Lead = ({ data, appendLog }: Interface) => {
       })
     ).unwrap();
     if (res.success) {
+      const statusData = statuses.find((info) => info.id === status);
       setComment('');
       appendLog(res.log);
+
+      handleStatusDisability(statusData);
     }
   };
 
   useEffect(() => {
     if (details) {
       const recordStatuses = statuses.filter(
-        (info) => info.statusFor === details.type
+        () => details.type === 'LEAD' || details.type === 'FOLLOW_UP_LEAD'
       );
       const currentStatus = statuses.find(
         (info) => info.id === details.recordStatusId
       );
       setStatus(currentStatus?.id);
       setStatusOptions(recordStatuses);
+      handleStatusDisability(currentStatus);
     }
   }, [details, statuses]);
   return (

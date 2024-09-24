@@ -1,28 +1,31 @@
 'use client';
 import React, { useState } from 'react';
+import { useSelector } from 'react-redux';
+
 import EmailBuilder from '../../EmailBuilder';
 
 interface CallNowInterface {
-  totalComments: number;
   phone: string;
   email: string;
 }
 
-const CallNow = ({ totalComments, phone, email }: CallNowInterface) => {
+const CallNow = ({ phone, email }: CallNowInterface) => {
   const [emailBuilders, setEmailBuilders] = useState<number[]>([]);
   const [tooltip, setTooltip] = useState<{
     type: string;
     visible: boolean;
   } | null>(null);
+  const disablePhone = useSelector((state) => state.comments.disablePhone);
+  const disableEmail = useSelector((state) => state.comments.disableEmail);
 
   const handleBoxClick = () => {
-    if (totalComments > 0) {
+    if (!disableEmail) {
       setEmailBuilders([...emailBuilders, emailBuilders.length]); // Add a new instance
     }
   };
 
   const handleClick = () => {
-    if (totalComments > 0) {
+    if (!disablePhone) {
       window.open(`openphone://dial?number=${phone}`);
     }
   };
@@ -42,9 +45,7 @@ const CallNow = ({ totalComments, phone, email }: CallNowInterface) => {
         onMouseEnter={() => showTooltip('call')}
         onMouseLeave={hideTooltip}
         className={`flex items-center ${
-          totalComments === 0
-            ? 'cursor-not-allowed opacity-50'
-            : 'cursor-pointer'
+          disablePhone ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'
         }`}
       >
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
@@ -63,12 +64,11 @@ const CallNow = ({ totalComments, phone, email }: CallNowInterface) => {
         </div>
         <h1 className="text-[14px] font-semibold ml-2">Call Now</h1>
       </div>
-
       <div
         onClick={handleBoxClick}
         onMouseEnter={() => showTooltip('email')}
         onMouseLeave={hideTooltip}
-        className={`flex items-center ${totalComments === 0 ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
+        className={`flex items-center ${disableEmail ? 'cursor-not-allowed opacity-50' : 'cursor-pointer'}`}
       >
         <div className="w-[45px] h-[45px] bg-[#EBF3FF] border-2 border-[#BDD2F2] rounded flex justify-center items-center">
           <svg
@@ -97,11 +97,11 @@ const CallNow = ({ totalComments, phone, email }: CallNowInterface) => {
           }}
         >
           {tooltip.type === 'call'
-            ? totalComments === 0
-              ? 'Make a comment to enable call'
+            ? disablePhone
+              ? 'Phone call is disabled'
               : 'Make a call'
-            : totalComments === 0
-              ? 'Make a comment to enable email'
+            : disableEmail
+              ? 'Email is disabled'
               : 'Send email'}
           <div className="tooltip-arrow" data-popper-arrow></div>
         </div>

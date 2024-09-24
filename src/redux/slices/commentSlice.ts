@@ -13,6 +13,8 @@ export interface CommentsInterface {
 const initialState = {
   isLoading: <boolean>false,
   data: <CommentsInterface[]>[],
+  disablePhone: <boolean>true,
+  disableEmail: <boolean>true,
 };
 
 export const getComments = createAsyncThunk(
@@ -35,6 +37,28 @@ export const addComment = createAsyncThunk(
       const url = `${CommentsEndpoints.addComment()}`;
       const resp = await api.post(`${url}`, data);
       return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const handleDisablePhone = createAsyncThunk(
+  'disable/phone',
+  async (data: { disable: boolean }, thunkAPI) => {
+    try {
+      return true;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const handleDisableEmail = createAsyncThunk(
+  'disable/email',
+  async (data: { disable: boolean }, thunkAPI) => {
+    try {
+      return true;
     } catch (error) {
       return thunkAPI.rejectWithValue(error.response.data);
     }
@@ -77,6 +101,48 @@ const commentSlice = createSlice({
       })
       .addCase(
         addComment.rejected,
+        (state, action: { payload: { message: string } }) => {
+          if (action?.payload?.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action?.payload?.message);
+          state.isLoading = false;
+        }
+      )
+
+      .addCase(handleDisablePhone.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(handleDisablePhone.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.disablePhone = action.meta.arg.disable;
+      })
+      .addCase(
+        handleDisablePhone.rejected,
+        (state, action: { payload: { message: string } }) => {
+          if (action?.payload?.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action?.payload?.message);
+          state.isLoading = false;
+        }
+      )
+
+      .addCase(handleDisableEmail.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(handleDisableEmail.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.disableEmail = action.meta.arg.disable;
+      })
+      .addCase(
+        handleDisableEmail.rejected,
         (state, action: { payload: { message: string } }) => {
           if (action?.payload?.message === 'Unauthorized') {
             sessionStorage.removeItem('token');

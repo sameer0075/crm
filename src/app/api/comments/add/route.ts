@@ -11,17 +11,96 @@ import { commentsSchema } from '@/utils/schemas/comment.schema';
 
 const prisma = new PrismaClient();
 
-/**
- * The API handler for adding a new record.
- *
- * @param {NextRequest} req - The Next.js request object
- * @returns {Promise<NextResponse>} - The response object with the new record information
- */
+const evaluateRecordType = async (status: string, recordId: string) => {
+  let type = '';
+  const callLogs = await prisma.activity_logs.count({
+    where: {
+      recordId,
+      type: 'call',
+    },
+  });
+
+  if (
+    status == 'Fresh' ||
+    status == 'Pre Research' ||
+    status == "Did'nt Connect" ||
+    status == 'Voicemail'
+  ) {
+    type = 'LEAD';
+  }
+
+  if (
+    status == 'Out of Office' ||
+    status == 'Call Back Later' ||
+    status == 'Refer to another person'
+  ) {
+    if (callLogs === 0) {
+      throw new ApiError(
+        StatusCode.badrequest,
+        'Atleast one phone call is required for this!'
+      );
+    }
+    type = 'FOLLOW_UP_LEAD';
+  }
+
+  if (status == 'Connected & Email Sent') {
+    const emailLogs = await prisma.activity_logs.count({
+      where: {
+        recordId,
+        type: 'email',
+      },
+    });
+
+    if (callLogs === 0 || emailLogs === 0) {
+      throw new ApiError(
+        StatusCode.badrequest,
+        'Atleast one phone call & email is required for this!'
+      );
+    }
+    type = 'OPPORTUNITY';
+  }
+
+  return type;
+};
+
 const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();
   try {
     const payload = commentsSchema.parse(body);
     const { status, ...rest } = payload;
+    const recordStatus = await prisma.record_status.findFirst({
+      where: {
+        id: status,
+      },
+    });
+
+    const record = await prisma.records.findFirst({
+      where: {
+        id: rest.recordId,
+      },
+      include: {
+        recordStatus: {
+          select: {
+            statusCode: true,
+          },
+        },
+      },
+    });
+
+    if (record) {
+      if (recordStatus.statusCode < record.recordStatus.statusCode) {
+        throw new ApiError(
+          StatusCode.badrequest,
+          'Previous Status Code cannot be selected!'
+        );
+      }
+
+      if (recordStatus.statusCode === record.recordStatus.statusCode) {
+        throw new ApiError(StatusCode.badrequest, 'Change your status!');
+      }
+    }
+
+    const recordType = await evaluateRecordType(recordStatus?.name, record?.id);
     const data = await prisma.comments.create({
       data: {
         ...rest,
@@ -54,6 +133,7 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
       },
       data: {
         recordStatusId: status,
+        type: recordType,
       },
     });
 

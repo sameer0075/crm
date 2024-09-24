@@ -417,7 +417,6 @@ const EmailComposer: React.FC = ({ email }: EmailComposerInterface) => {
             </div>
             <div className="w-full resize-none focus:outline-none max-h-[200px] overflow-auto">
               {attachments?.map((file, index: number) => {
-                console.log('file', file);
                 return (
                   <div
                     key={index}

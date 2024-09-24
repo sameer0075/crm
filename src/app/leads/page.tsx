@@ -7,11 +7,17 @@ import Button from '../components/Button';
 import { LeadLabels } from '../components/mockdata/leads';
 import Table from '../components/Table';
 import FileUpload from '../components/FileUpload';
-import { bulkUpload, getLeads } from '@/redux/slices/lead-slice';
+import {
+  bulkUpload,
+  getLeads,
+  getFollowUpLeads,
+} from '@/redux/slices/lead-slice';
 const Leads = () => {
   const loading = useSelector((state) => state.leads.isLoading);
   const data = useSelector((state) => state.leads.data);
   const count = useSelector((state) => state.leads.count);
+  const followUpData = useSelector((state) => state.leads.followUpData);
+  const followUpCount = useSelector((state) => state.leads.followUpCount);
   const dispatch = useDispatch<AppDispatch>();
   const [openFileUpload, setFileUpload] = useState(false);
   const [file, setFile] = useState(null);
@@ -78,6 +84,15 @@ const Leads = () => {
     dispatch(getLeads(payload));
   };
 
+  const getFollowUpList = (page: number, pageSize: number) => {
+    const payload = {
+      type: 'FOLLOW_UP_LEAD',
+      page,
+      pageSize,
+    };
+    dispatch(getFollowUpLeads(payload));
+  };
+
   return (
     <div className="w-full">
       <div className="flex m-10">
@@ -112,7 +127,15 @@ const Leads = () => {
       </div>
 
       <div className="m-8">
-        <Table labels={LeadLabels} data={[]} title="Follow Up Leads" />
+        <Table
+          labels={LeadLabels}
+          data={followUpData}
+          title="Follow Up Leads"
+          totalRecords={followUpCount}
+          loading={loading}
+          handleApiCall={getFollowUpList}
+          handleView={handleView}
+        />
       </div>
 
       <div className="m-8">

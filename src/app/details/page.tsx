@@ -125,11 +125,7 @@ const Page = () => {
           </div>
           {/* Third Column */}
           <div className="col-span-12 md:col-span-3 flex flex-col gap-4">
-            <CallNow
-              totalComments={comments?.length ?? 0}
-              phone={details?.phone}
-              email={data?.email}
-            />
+            <CallNow phone={data?.phone} email={data?.email} />
             <CalendarLogs data={phoneLogsData} />
             <ActivityLog data={comments} />
           </div>
