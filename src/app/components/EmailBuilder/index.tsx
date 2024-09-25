@@ -1,6 +1,6 @@
 import React, { useState, KeyboardEvent } from 'react';
 import { useDispatch } from 'react-redux';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 import { toast } from 'react-toastify';
 import { Editor } from '@tinymce/tinymce-react';
@@ -27,6 +27,8 @@ const EmailComposer: React.FC = ({ email }: EmailComposerInterface) => {
   const [showBcc, setShowBcc] = useState<boolean>(false);
   const [showRecipientLabel, setShowRecipientLabel] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
+
+  const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
   const params = useSearchParams();
@@ -62,7 +64,7 @@ const EmailComposer: React.FC = ({ email }: EmailComposerInterface) => {
     }
   };
 
-  const handleSend = () => {
+  const handleSend = async () => {
     setLoading(true);
     console.log({
       to,
@@ -98,16 +100,15 @@ const EmailComposer: React.FC = ({ email }: EmailComposerInterface) => {
     });
 
     if (to?.length > 0 && body != '' && subject != '') {
-      dispatch(sendMail({ id, data: formData }))
-        .then(() => {
-          toast.info('Email Sent Successfully');
-          setLoading(false);
-          handleDelete();
-        })
-        .catch(() => {
-          setLoading(false);
-          handleDelete();
-        });
+      const res = await dispatch(sendMail({ id, data: formData })).unwrap();
+      if (res.success) {
+        toast.info('Email Sent Successfully');
+        setLoading(false);
+        handleDelete();
+        if (res.nextRecordId) {
+          router.push(`/details?id=${res.nextRecordId}`);
+        }
+      }
     }
   };
 

@@ -22,6 +22,7 @@ const commentsSchema = z.object({
     .refine((val) => val !== undefined && val !== '', {
       message: 'Status is required', // Custom message for undefined
     }),
+  customDate: z.string().nullable().optional(),
 });
 
 export { commentsSchema };

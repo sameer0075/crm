@@ -66,6 +66,36 @@ export const getFollowUpLeads = createAsyncThunk(
   }
 );
 
+export const getOpportunities = createAsyncThunk(
+  'opportunities/list',
+  async (data: { type: string; page: number; pageSize: number }, thunkAPI) => {
+    try {
+      const url = `${LeadEndpoints.opportunityList(data.type)}`;
+      const resp = await api.get(
+        `${url}?page=${data.page}&pageSize=${data.pageSize}`
+      );
+      return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
+export const getFollowUpOpportunities = createAsyncThunk(
+  'follow-up-opportunities/list',
+  async (data: { type: string; page: number; pageSize: number }, thunkAPI) => {
+    try {
+      const url = `${LeadEndpoints.opportunityList(data.type)}`;
+      const resp = await api.get(
+        `${url}?page=${data.page}&pageSize=${data.pageSize}`
+      );
+      return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const leadDetails = createAsyncThunk(
   'leads/get',
   async (data: { id: string }, thunkAPI) => {
@@ -120,6 +150,28 @@ const leadsSlice = createSlice({
         }
       )
 
+      .addCase(getOpportunities.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getOpportunities.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.data = action.payload.data;
+        state.count = action.payload.totalCount;
+      })
+      .addCase(
+        getOpportunities.rejected,
+        (state, action: { payload: { message: string } }) => {
+          if (action.payload.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action.payload.message);
+          state.isLoading = false;
+        }
+      )
+
       .addCase(getFollowUpLeads.pending, (state) => {
         state.isLoading = true;
       })
@@ -130,6 +182,28 @@ const leadsSlice = createSlice({
       })
       .addCase(
         getFollowUpLeads.rejected,
+        (state, action: { payload: { message: string } }) => {
+          if (action.payload.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action.payload.message);
+          state.isLoading = false;
+        }
+      )
+
+      .addCase(getFollowUpOpportunities.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getFollowUpOpportunities.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.followUpData = action.payload.data;
+        state.followUpCount = action.payload.totalCount;
+      })
+      .addCase(
+        getFollowUpOpportunities.rejected,
         (state, action: { payload: { message: string } }) => {
           if (action.payload.message === 'Unauthorized') {
             sessionStorage.removeItem('token');

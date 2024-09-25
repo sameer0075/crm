@@ -63,4 +63,23 @@ const fileHandling = async (
   });
 };
 
-export { removeSensitiveFields, validateEmail, isValidFile, fileHandling };
+const timeConversion = ({ time, unit }: { time: number; unit: string }) => {
+  switch (unit) {
+    case 'seconds':
+      return time * 1000; // Convert seconds to milliseconds
+    case 'minutes':
+      return time * 60 * 1000; // Convert minutes to milliseconds
+    case 'hours':
+      return time * 60 * 60 * 1000; // Convert hours to milliseconds
+    default:
+      return null; // Handle unknown unit
+  }
+};
+
+export {
+  removeSensitiveFields,
+  validateEmail,
+  isValidFile,
+  fileHandling,
+  timeConversion,
+};

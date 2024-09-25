@@ -4,6 +4,7 @@ const AuthEndpoints = {
 
 const LeadEndpoints = {
   leadsList: (type: string) => `/records/list/${type}`,
+  opportunityList: (type: string) => `/records/visible/${type}`,
   leadDetails: (id: string) => `/records/get/${id}`,
   bulkUpload: () => `/records/bulk-upload`,
 };

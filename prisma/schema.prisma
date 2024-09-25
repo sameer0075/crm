@@ -54,6 +54,13 @@ model record_status {
   records     records[]
 }
 
+model FollowUpSettings {
+  id     String    @id @default(uuid()) @db.Uuid
+  round  Int    // Round number (1, 2, 3, etc.)
+  time   Int    // Time in hours (e.g., 24, 48, 168 for 1 week)
+  unit   String // Time unit ('seconds', 'minutes', 'hours')
+}
+
 model comments {
   id        String   @id @default(uuid()) @db.Uuid
   comment   String
@@ -68,6 +75,8 @@ model records {
   id          String  @id @default(uuid()) @db.Uuid
   firstName String
   lastName String
+  autoNumber Int @default(autoincrement())
+  statusCode  Int @default(autoincrement())
   fullName  String
   title String?
   email String
@@ -87,6 +96,9 @@ model records {
   country String?
   company_linkedin_url String?
   linkedin_profile String?
+  lastContacted  DateTime?
+  visibleAfter   DateTime?
+  round          Int?
   comments    comments[]
   logs    activity_logs[]
   is_active Boolean? @default(true)

@@ -5,10 +5,11 @@ import { v2 as cloudinary } from 'cloudinary';
 import nodemailer from 'nodemailer';
 
 import { globalErrorHandler } from '@/lib/error-handling/error-handler';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, record_status, records } from '@prisma/client';
 import { StatusCode } from '@/utils/enums';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
+import { timeConversion } from '@/utils/helper-functions';
 const prisma = new PrismaClient();
 
 cloudinary.config({
@@ -21,6 +22,42 @@ export const config = {
   api: {
     bodyParser: false,
   },
+};
+
+async function getTimeForRound(round: number): Promise<number | null> {
+  const setting = await prisma.followUpSettings.findFirst({
+    where: { round },
+  });
+
+  if (!setting) {
+    return null;
+  }
+
+  return timeConversion({ time: setting.time, unit: setting.unit });
+}
+
+const handleRecordVisibility = async (
+  record: records,
+  recordStatus: record_status
+) => {
+  if (recordStatus.name === 'Connected & Email Sent') {
+    const now = new Date();
+    const nextRound = record?.round ? record.round + 1 : 1;
+    console.log('round', nextRound);
+    const timeForNextRound = await getTimeForRound(nextRound);
+
+    if (!timeForNextRound) {
+      throw new ApiError(StatusCode.badrequest, 'No Follow Up Settings Found!');
+    }
+
+    const nextVisibility = new Date(now.getTime() + timeForNextRound);
+
+    return {
+      visibleAfter: nextVisibility,
+      lastContacted: now,
+      round: nextRound,
+    };
+  }
 };
 
 const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
@@ -129,6 +166,7 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       },
     });
 
+    let nextRecordId;
     if (callLogs !== 0) {
       const recordStatus = await prisma.record_status.findFirst({
         where: {
@@ -136,16 +174,36 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
         },
       });
 
-      if (recordStatus) {
-        await prisma.records.update({
-          where: {
-            id: record.id,
-          },
-          data: {
-            recordStatusId: recordStatus.id,
-            type: 'OPPORTUNITY',
-          },
-        });
+      const visibility = await handleRecordVisibility(record, recordStatus);
+      if (recordStatus && visibility) {
+        if (record.type === 'FOLLOW_UP_LEAD') {
+          const nextRecord = await prisma.records.findFirst({
+            where: {
+              autoNumber: {
+                gt: record.autoNumber,
+              },
+              type: 'LEAD',
+              is_active: true,
+            },
+            orderBy: {
+              autoNumber: 'asc',
+            },
+          });
+          nextRecordId = nextRecord.id;
+
+          await prisma.records.update({
+            where: {
+              id: record.id,
+            },
+            data: {
+              recordStatusId: recordStatus.id,
+              type: 'OPPORTUNITY',
+              visibleAfter: visibility.visibleAfter,
+              lastContacted: visibility.lastContacted,
+              round: visibility.round,
+            },
+          });
+        }
       }
     }
 
@@ -153,6 +211,7 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       {
         success: true,
         message: 'Email sent successfully.',
+        nextRecordId,
       },
       { status: StatusCode.success }
     );

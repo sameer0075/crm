@@ -1,6 +1,8 @@
 import React, { ChangeEvent, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'next/navigation';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useSearchParams, useRouter } from 'next/navigation';
 import {
   CommentsInterface,
   addComment,
@@ -20,16 +22,19 @@ interface Interface {
 }
 
 const Lead = ({ data, appendLog }: Interface) => {
+  const [startDate, setStartDate] = useState(null);
   const [comment, setComment] = useState<string>('');
   const [status, setStatus] = useState<string>('');
   const [statusOptions, setStatusOptions] = useState<StatusInterface[]>([]);
   const [statusError, setStatusError] = useState<boolean>(false); // Error state for status
+  const [customDateError, setCustomDateError] = useState<boolean>(false);
   const details = useSelector((state) => state.leads.details);
   const loading = useSelector((state) => state.comments.isLoading);
   const statuses = useSelector((state) => state.status.data);
   const dispatch = useDispatch<AppDispatch>();
   const params = useSearchParams();
   const id = params.get('id');
+  const router = useRouter();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -59,18 +64,33 @@ const Lead = ({ data, appendLog }: Interface) => {
       toast.error('Status is required!');
       return;
     }
+
+    const currentStatus = statuses.find((info) => info.id === status);
+
+    if (currentStatus.name == 'Follow Up on Custom Date') {
+      if (!startDate) {
+        setCustomDateError(true);
+        return;
+      } else {
+        setCustomDateError(false);
+      }
+    }
+
     const res = await dispatch(
       addComment({
         comment,
         recordId: id,
         status,
+        customDate: startDate,
       })
     ).unwrap();
     if (res.success) {
       const statusData = statuses.find((info) => info.id === status);
       setComment('');
       appendLog(res.log);
-
+      if (res.nextRecordId) {
+        router.push(`/details?id=${res.nextRecordId}`);
+      }
       handleStatusDisability(statusData);
     }
   };
@@ -83,7 +103,10 @@ const Lead = ({ data, appendLog }: Interface) => {
           (info) =>
             info.statusFor === 'LEAD' || info.statusFor === 'FOLLOW_UP_LEAD'
         );
-      } else if (details.type === 'OPPORTUNITY') {
+      } else if (
+        details.type === 'OPPORTUNITY' ||
+        details.type === 'FOLLOW_UP_OPPORTUNITY'
+      ) {
         recordStatuses = statuses.filter(
           (info) =>
             info.statusFor === 'OPPORTUNITY' ||
@@ -98,6 +121,9 @@ const Lead = ({ data, appendLog }: Interface) => {
       handleStatusDisability(currentStatus);
     }
   }, [details, statuses]);
+
+  const currentStatus = statuses.find((info) => info.id === status);
+
   return (
     <div className="w-full flex justify-center px-4 sm:px-0">
       <div className="w-full sm:w-[500px] md:w-[600px] p-4 sm:p-6 lg:w-[670px] flex-shrink-0 ">
@@ -175,12 +201,36 @@ const Lead = ({ data, appendLog }: Interface) => {
             >
               Comments
             </label>
-            <Select
-              options={statusOptions}
-              className={statusError ? 'border-red-500' : ''}
-              handleChange={handleStatus}
-              value={status}
-            />
+            <div className="flex items-center space-x-4">
+              <Select
+                options={statusOptions}
+                className={statusError ? 'border-red-500' : ''}
+                handleChange={handleStatus}
+                value={status}
+              />
+              {currentStatus?.name == 'Follow Up on Custom Date' && (
+                <div className="flex flex-col mb-6">
+                  <label
+                    htmlFor="date"
+                    className="text-xs font-medium text-gray-600 mb-1"
+                  >
+                    Select Date
+                  </label>
+                  <DatePicker
+                    selected={startDate}
+                    onChange={(date) => {
+                      console.log('date', date);
+                      setCustomDateError(false);
+                      setStartDate(date);
+                    }}
+                    showTimeSelect
+                    timeFormat="HH:mm"
+                    minDate={new Date()}
+                    className={`p-2 border border-gray-300 rounded-md h-[25px] w-[150px] ${customDateError ? 'border-red-500' : ''}`}
+                  />
+                </div>
+              )}
+            </div>
           </div>
           <TextArea
             id="comment"
