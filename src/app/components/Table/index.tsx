@@ -1,5 +1,6 @@
 'use client';
 import React, { useMemo, useState, useEffect } from 'react';
+import Link from 'next/link';
 import { DataTable } from 'primereact/datatable';
 import { PaginationState } from 'primereact/paginator'; // Import PaginationState for type safety
 import { Column } from 'primereact/column';
@@ -17,7 +18,6 @@ interface TableInterface {
   totalRecords?: number;
   loading?: boolean;
   handleApiCall?: () => void;
-  handleView: () => void;
 }
 
 interface LabelsInterface {
@@ -41,7 +41,6 @@ export default function Table({
   totalRecords = 0,
   loading = false,
   handleApiCall,
-  handleView,
 }: TableInterface) {
   const [pagination, setPagination] = useState({
     first: 0,
@@ -53,7 +52,6 @@ export default function Table({
   const [sortOrder, setSortOrder] = useState(null);
 
   const onSort = (event) => {
-    console.log('event', event);
     setSortField(event.sortField);
     setSortOrder(event.sortOrder);
   };
@@ -91,27 +89,14 @@ export default function Table({
       return {
         ...processedItem,
         lead_source,
-        action: (
-          <div className="flex">
-            <img
-              className="cursor-pointer mr-2"
-              src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/phone.png`}
-            />
-            <img
-              className="cursor-pointer"
-              src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/email.png`}
-            />
-          </div>
-        ),
         updatedAt: moment(updatedAt).format('DD/MM/YYYY'),
         view: (
-          <div
-            className="cursor-pointer ml-1 w-[50px]"
-            onClick={() => handleView(rest.id)}
-          >
-            <img
-              src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/detail.png`}
-            />
+          <div className="cursor-pointer ml-1 w-[50px]">
+            <Link href={`/details?id=${rest.id}`} prefetch={true}>
+              <img
+                src={`${process.env.NEXT_PUBLIC_FRONTEND_URL}/icons/detail.png`}
+              />
+            </Link>
           </div>
         ),
       };

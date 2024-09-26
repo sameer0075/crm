@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 
 import Stepper from '../components/Lead/stepper';
 import CallActivity from '../components/Lead/activity';
@@ -12,26 +12,43 @@ import Loader from '../components/loader';
 import Novatore from '../components/Lead/novatore';
 import DetailLogs from '../components/Lead/details';
 import CallNow from '../components/Lead/callnow';
-import { leadDetails } from '@/redux/slices/lead-slice';
+import { leadDetails, setNextRecord } from '@/redux/slices/lead-slice';
 import { getLogs, clearLogs } from '@/redux/slices/logs-slice';
 import { getComments } from '@/redux/slices/commentSlice';
 import { AppDispatch } from '@/redux/store';
 import { getStatuses } from '@/redux/slices/status-slice';
+import Modal from '../components/Modal';
 
 const Page = () => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [phoneLogsData, setPhoneLogsData] = useState([]);
   const [logsData, setLogsData] = useState([]);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
 
   const [contactRoles, setContactRoles] = useState(null);
   const data = useSelector((state) => state.leads.details);
   const allLogs = useSelector((state) => state.logs.allLogs);
   const comments = useSelector((state) => state.comments.data);
+  const nextRecordId = useSelector((state) => state.leads.nextRecordId);
   const dispatch = useDispatch<AppDispatch>();
-
   const params = useSearchParams();
+  const router = useRouter();
   const id = params.get('id');
+
+  const navigateToNextRecord = () => {
+    if (nextRecordId) {
+      dispatch(clearLogs());
+      dispatch(setNextRecord({ id: '' }));
+      setLogsData([]);
+      router.push(`/details?id=${nextRecordId}`);
+    }
+  };
+
+  const handleModal = () => {
+    setModalOpen(!modalOpen);
+  };
+
   useEffect(() => {
     if (id) {
       setLoading(true);
@@ -99,6 +116,12 @@ const Page = () => {
     };
   }, []);
 
+  useEffect(() => {
+    if (nextRecordId) {
+      setModalOpen(true);
+    }
+  }, [nextRecordId]);
+
   const appendLog = (log) => {
     setLogsData((prev) => [log, ...prev]); // Implicitly return a new array
   };
@@ -120,7 +143,7 @@ const Page = () => {
           </div>
           {/* Second Column */}
           <div className="col-span-12 md:col-span-6 flex flex-col gap-4">
-            <Stepper data={comments} appendLog={appendLog} />
+            <Stepper data={comments} appendLog={appendLog} type={data?.type} />
             <CallActivity data={logsData} />
           </div>
           {/* Third Column */}
@@ -131,6 +154,12 @@ const Page = () => {
           </div>
         </div>
       </div>
+      <Modal
+        isOpen={modalOpen}
+        onClose={handleModal}
+        title="Go to next lead"
+        handleSubmit={navigateToNextRecord}
+      />
     </section>
   );
 };

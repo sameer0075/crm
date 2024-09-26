@@ -34,7 +34,19 @@ const initialState = {
   count: <number>0,
   followUpCount: <number>0,
   details: <RecordsInterface>null,
+  nextRecordId: <string>'',
 };
+
+export const setNextRecord = createAsyncThunk(
+  'leads/nextRecord',
+  async (data: { id: string }, thunkAPI) => {
+    try {
+      return true;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
 
 export const getLeads = createAsyncThunk(
   'leads/list',
@@ -128,6 +140,25 @@ const leadsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      .addCase(setNextRecord.pending, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(setNextRecord.fulfilled, (state, action) => {
+        state.nextRecordId = action.meta.arg.id;
+      })
+      .addCase(
+        setNextRecord.rejected,
+        (state, action: { payload: { message: string } }) => {
+          state.isLoading = false;
+          if (action.payload.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action.payload.message);
+        }
+      )
       .addCase(getLeads.pending, (state) => {
         state.isLoading = true;
       })

@@ -43,7 +43,6 @@ const handleRecordVisibility = async (
   if (recordStatus.name === 'Connected & Email Sent') {
     const now = new Date();
     const nextRound = record?.round ? record.round + 1 : 1;
-    console.log('round', nextRound);
     const timeForNextRound = await getTimeForRound(nextRound);
 
     if (!timeForNextRound) {

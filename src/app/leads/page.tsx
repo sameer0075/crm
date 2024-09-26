@@ -1,6 +1,5 @@
 'use client';
 import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useDispatch, useSelector } from 'react-redux';
 
 import Button from '../components/Button';
@@ -22,8 +21,6 @@ const Leads = () => {
   const [openFileUpload, setFileUpload] = useState(false);
   const [file, setFile] = useState(null);
   const [extentionError, setExtentionError] = useState(null);
-
-  const router = useRouter();
 
   const handleFileUploadModal = () => {
     const value = !openFileUpload;
@@ -69,10 +66,6 @@ const Leads = () => {
     dispatch(bulkUpload(formData)).then(() => {
       handleFileUploadModal();
     });
-  };
-
-  const handleView = (id: string) => {
-    router.push(`/details?id=${id}`);
   };
 
   const getList = (page: number, pageSize: number) => {
@@ -134,7 +127,6 @@ const Leads = () => {
           totalRecords={followUpCount}
           loading={loading}
           handleApiCall={getFollowUpList}
-          handleView={handleView}
         />
       </div>
 
@@ -146,7 +138,6 @@ const Leads = () => {
           totalRecords={count}
           loading={loading}
           handleApiCall={getList}
-          handleView={handleView}
         />
       </div>
     </div>

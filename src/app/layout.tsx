@@ -37,6 +37,13 @@ export default function RootLayout({
     handleAthentication();
   }, []);
 
+  useEffect(() => {
+    router.prefetch('/leads');
+    router.prefetch('/opportunity');
+    router.prefetch('/');
+    router.prefetch('/details/[id]');
+  }, []);
+
   return (
     <html lang="en">
       <body

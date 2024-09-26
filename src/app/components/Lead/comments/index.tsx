@@ -2,13 +2,14 @@ import React, { ChangeEvent, useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import {
   CommentsInterface,
   addComment,
   handleDisablePhone,
   handleDisableEmail,
 } from '@/redux/slices/commentSlice';
+import { setNextRecord } from '@/redux/slices/lead-slice';
 import { AppDispatch } from '@/redux/store';
 import { toast } from 'react-toastify';
 import TextArea from '../../TextArea';
@@ -34,7 +35,6 @@ const Lead = ({ data, appendLog }: Interface) => {
   const dispatch = useDispatch<AppDispatch>();
   const params = useSearchParams();
   const id = params.get('id');
-  const router = useRouter();
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setComment(e.target.value);
@@ -89,7 +89,7 @@ const Lead = ({ data, appendLog }: Interface) => {
       setComment('');
       appendLog(res.log);
       if (res.nextRecordId) {
-        router.push(`/details?id=${res.nextRecordId}`);
+        dispatch(setNextRecord({ id: res.nextRecordId }));
       }
       handleStatusDisability(statusData);
     }
@@ -219,7 +219,6 @@ const Lead = ({ data, appendLog }: Interface) => {
                   <DatePicker
                     selected={startDate}
                     onChange={(date) => {
-                      console.log('date', date);
                       setCustomDateError(false);
                       setStartDate(date);
                     }}

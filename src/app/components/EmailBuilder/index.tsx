@@ -1,12 +1,13 @@
 import React, { useState, KeyboardEvent } from 'react';
 import { useDispatch } from 'react-redux';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 
 import { toast } from 'react-toastify';
 import { Editor } from '@tinymce/tinymce-react';
 import { X } from 'lucide-react';
 
 import { sendMail } from '@/redux/slices/logs-slice';
+import { setNextRecord } from '@/redux/slices/lead-slice';
 import Button from '../Button';
 
 interface EmailComposerInterface {
@@ -27,8 +28,6 @@ const EmailComposer: React.FC = ({ email }: EmailComposerInterface) => {
   const [showBcc, setShowBcc] = useState<boolean>(false);
   const [showRecipientLabel, setShowRecipientLabel] = useState<boolean>(true);
   const [loading, setLoading] = useState<boolean>(false);
-
-  const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
   const params = useSearchParams();
@@ -106,7 +105,7 @@ const EmailComposer: React.FC = ({ email }: EmailComposerInterface) => {
         setLoading(false);
         handleDelete();
         if (res.nextRecordId) {
-          router.push(`/details?id=${res.nextRecordId}`);
+          dispatch(setNextRecord({ id: res.nextRecordId }));
         }
       }
     }

@@ -49,7 +49,6 @@ export const openPhoneMiddleware = async (
       .update(Buffer.from(signedData, 'utf8'))
       .digest('base64');
 
-    console.log('computedDigest---', computedDigest, providedDigest);
     // Make sure the computed digest matches the digest in the openphone header.
     if (providedDigest !== computedDigest) {
       return NextResponse.json(
