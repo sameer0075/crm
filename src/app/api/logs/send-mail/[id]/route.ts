@@ -174,6 +174,7 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       });
 
       const visibility = await handleRecordVisibility(record, recordStatus);
+      console.log('visibility', visibility);
       if (recordStatus && visibility) {
         if (record.type === 'FOLLOW_UP_LEAD') {
           const nextRecord = await prisma.records.findFirst({

@@ -70,7 +70,9 @@ const evaluateRecordType = async (status: string, recordId: string) => {
     status == 'Out of Office' ||
     status == 'Call Back Later' ||
     status == 'Refer to another person' ||
-    status == 'Call Connected & Interested'
+    status == 'Call Connected & Interested' ||
+    status == 'Receptionist' ||
+    status == 'Follow Up'
   ) {
     if (callLogs === 0) {
       throw new ApiError(
@@ -100,6 +102,10 @@ const evaluateRecordType = async (status: string, recordId: string) => {
 
   if (status == 'Keep on Follow Up' || status == 'Follow Up on Custom Date') {
     type = 'FOLLOW_UP_OPPORTUNITY';
+  }
+
+  if (status === 'Book A Meeting') {
+    type = 'APPOINTMENT';
   }
 
   return type;
@@ -150,6 +156,57 @@ const handleRecordVisibility = async (
   }
 };
 
+const statusValidation = (recordStatusName: string, statusName: string) => {
+  if (recordStatusName == 'Pre Research' && statusName == 'Fresh') {
+    throw new ApiError(
+      StatusCode.badrequest,
+      'Previous Status Code cannot be selected!'
+    );
+  }
+
+  if (
+    (recordStatusName == "Did'nt Connect" ||
+      recordStatusName == 'Voicemail' ||
+      recordStatusName == 'Receptionist' ||
+      recordStatusName == 'Out of Office' ||
+      recordStatusName == 'Call Back Later' ||
+      recordStatusName == 'Refer to another person') &&
+    statusName == 'Pre Research'
+  ) {
+    throw new ApiError(
+      StatusCode.badrequest,
+      'Previous Status Code cannot be selected!'
+    );
+  }
+
+  if (
+    recordStatusName === 'Call Connected & Interested' &&
+    (statusName == "Did'nt Connect" ||
+      statusName == 'Voicemail' ||
+      statusName == 'Receptionist')
+  ) {
+    throw new ApiError(
+      StatusCode.badrequest,
+      'Previous Status Code cannot be selected!'
+    );
+  }
+
+  if (
+    recordStatusName === 'Connected & Email Sent' &&
+    (statusName == 'Voicemail' ||
+      statusName == 'Receptionist' ||
+      statusName == 'Out of Office' ||
+      statusName == 'Call Back Later' ||
+      statusName == 'Refer to another person' ||
+      statusName == 'Call Connected & Interested')
+  ) {
+    throw new ApiError(
+      StatusCode.badrequest,
+      'Previous Status Code cannot be selected!'
+    );
+  }
+};
+
 const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();
   try {
@@ -169,8 +226,15 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
         recordStatus: {
           select: {
             statusCode: true,
+            name: true,
           },
         },
+      },
+    });
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.userId,
       },
     });
 
@@ -192,23 +256,55 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
         },
       });
 
-      return await prisma.records.update({
+      const notInterestedRecord = await prisma.records.update({
         where: {
           id: rest.recordId,
         },
         data: {
           recordStatusId: notInterestedStatus.id,
+          type: 'NOT_INTERESTED_LEAD',
         },
       });
+
+      const logPayload = {
+        type: 'comment',
+        logType: 'LEAD',
+        record: {
+          connect: {
+            id: payload.recordId,
+          },
+        },
+        eventCreation: new Date(),
+        from: user.phone,
+      };
+
+      const logData = await prisma.activity_logs.create({ data: logPayload });
+      const nextRecord = await prisma.records.findFirst({
+        where: {
+          autoNumber: {
+            gt: notInterestedRecord.autoNumber,
+          },
+          type: 'LEAD',
+          is_active: true,
+        },
+        orderBy: {
+          autoNumber: 'asc',
+        },
+      });
+      return NextResponse.json(
+        {
+          success: true,
+          message: 'Record Marked as Not Interested',
+          data: notInterestedRecord,
+          log: logData,
+          nextRecordId: nextRecord?.id,
+        },
+        { status: StatusCode.success }
+      );
     }
 
-    if (record) {
-      if (recordStatus.statusCode < record.recordStatus.statusCode) {
-        throw new ApiError(
-          StatusCode.badrequest,
-          'Previous Status Code cannot be selected!'
-        );
-      }
+    if (record && recordStatus) {
+      statusValidation(record.recordStatus.name, recordStatus.name);
     }
 
     const recordType = await evaluateRecordType(recordStatus?.name, record?.id);
@@ -216,12 +312,6 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
       data: {
         ...rest,
         userId: req.userId,
-      },
-    });
-
-    const user = await prisma.user.findFirst({
-      where: {
-        id: req.userId,
       },
     });
 

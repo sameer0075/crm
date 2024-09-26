@@ -41,6 +41,7 @@ const Page = () => {
       dispatch(clearLogs());
       dispatch(setNextRecord({ id: '' }));
       setLogsData([]);
+      setPhoneLogsData([]);
       router.push(`/details?id=${nextRecordId}`);
     }
   };

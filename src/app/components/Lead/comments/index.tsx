@@ -86,6 +86,7 @@ const Lead = ({ data, appendLog }: Interface) => {
     ).unwrap();
     if (res.success) {
       const statusData = statuses.find((info) => info.id === status);
+      toast.info(res.message);
       setComment('');
       appendLog(res.log);
       if (res.nextRecordId) {
