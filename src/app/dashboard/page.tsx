@@ -31,6 +31,7 @@ const Dashboard = () => {
   const [users, setUsers] = useState([]);
   const [startDate, setStartDate] = useState<Date | string | null>(null);
   const [endDate, setEndDate] = useState<Date | string | null>(null);
+  const [decoded, setDecoded] = useState(null);
   const [userId, setUserId] = useState('');
   const dispatch = useDispatch<AppDispatch>();
 
@@ -127,11 +128,16 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  const token = sessionStorage.getItem('token');
-  let decoded;
-  if (token) {
-    decoded = jwtDecode(token);
-  }
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      // This will only run on the client side
+      const token = sessionStorage.getItem('token');
+      if (token) {
+        const decodedToken = jwtDecode(token);
+        setDecoded(decodedToken);
+      }
+    }
+  }, []);
 
   return (
     <div>
