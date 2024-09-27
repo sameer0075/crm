@@ -251,7 +251,16 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
       where: {
         id: req.userId,
       },
+      include: {
+        role: true,
+      },
     });
+
+    if (user && user.role && record && user.role.name !== 'ADMIN') {
+      if (user.id != record.userId) {
+        throw new ApiError(StatusCode.badrequest, 'Record not found!');
+      }
+    }
 
     if (
       record?.round >= 2 &&
@@ -344,7 +353,6 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
       eventCreation: new Date(),
       from: user?.phone,
     };
-    console.log('recordType', recordType, record?.type);
     const activityLog = await prisma.activity_logs.create({ data: logPayload });
     if (
       record?.type === 'OPPORTUNITY' ||

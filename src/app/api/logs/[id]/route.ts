@@ -25,6 +25,28 @@ const ActivityLogsListHandler = async (
       throw new ApiError(StatusCode.badrequest, 'Record id is required!');
     }
 
+    const record = await prisma.user.findFirst({
+      where: {
+        id,
+        is_active: true,
+      },
+    });
+
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.userId,
+      },
+      include: {
+        role: true,
+      },
+    });
+
+    if (user && user.role && record && user.role.name !== 'ADMIN') {
+      if (user.id != record.userId) {
+        throw new ApiError(StatusCode.badrequest, 'Record not found!');
+      }
+    }
+
     let logs;
     if (type && type != 'all') {
       logs = await prisma.activity_logs.findMany({

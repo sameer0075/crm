@@ -33,6 +33,21 @@ const CommentsListHandler = async (req: NextRequest): Promise<NextResponse> => {
       throw new ApiError(StatusCode.badrequest, 'Record not found!');
     }
 
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.userId,
+      },
+      include: {
+        role: true,
+      },
+    });
+
+    if (user && user.role && record && user.role.name !== 'ADMIN') {
+      if (user.id != record.userId) {
+        throw new ApiError(StatusCode.badrequest, 'Record not found!');
+      }
+    }
+
     // const { skip = 0, take = 5 } = req.pagination || {};
 
     const [comments] = await Promise.all([

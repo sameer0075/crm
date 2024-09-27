@@ -34,6 +34,21 @@ const updateRecordHandler = async (req: NextRequest): Promise<NextResponse> => {
     },
   });
 
+  const user = await prisma.user.findFirst({
+    where: {
+      id: req.userId,
+    },
+    include: {
+      role: true,
+    },
+  });
+
+  if (user && user.role && recordExists && user.role.name !== 'ADMIN') {
+    if (user.id != recordExists.userId) {
+      throw new ApiError(StatusCode.badrequest, 'Record not found!');
+    }
+  }
+
   if (!recordExists) {
     throw new ApiError(
       StatusCode.badrequest,

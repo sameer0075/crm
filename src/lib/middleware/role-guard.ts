@@ -10,6 +10,12 @@ const hasRequiredRole = (role: string): boolean => {
   return role === RoleEnums.ADMIN;
 };
 
+declare module 'next/server' {
+  interface NextRequest {
+    userId: string;
+  }
+}
+
 export const RoleGuard = async (
   req: NextRequest
 ): Promise<NextResponse | void> => {
@@ -26,7 +32,8 @@ export const RoleGuard = async (
   try {
     // Verify the JWT token and extract the payload
     const decoded = jwt.verify(token, secretKey) as jwt.JwtPayload;
-
+    const userId = decoded.id;
+    req.userId = userId;
     // Extract user role from the decoded payload
     const userRole = decoded.role;
 

@@ -9,6 +9,12 @@ import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
 import { paginationMiddleware } from '@/lib/middleware/pagination-middleware';
 const prisma = new PrismaClient();
 
+type WhereType = {
+  type: string;
+  is_active: boolean;
+  userId?: string; // Optional field for userId
+};
+
 /**
  * Handles the GET request to fetch records by type.
  *
@@ -21,6 +27,15 @@ const RecordsListHandler = async (req: NextRequest): Promise<NextResponse> => {
     throw new ApiError(StatusCode.badrequest, 'Record type is required!');
   }
 
+  const user = await prisma.user.findFirst({
+    where: {
+      id: req.userId,
+    },
+    include: {
+      role: true,
+    },
+  });
+
   if (!RecordsEnum.includes(type)) {
     throw new ApiError(
       StatusCode.badrequest,
@@ -29,14 +44,18 @@ const RecordsListHandler = async (req: NextRequest): Promise<NextResponse> => {
   }
 
   const { skip = 0, take = 5 } = req.pagination || {};
+  const where: WhereType = { type, is_active: true };
 
+  if (user && user.role && user.role.name !== 'ADMIN') {
+    where['userId'] = user.id;
+  }
   const [records, totalCount] = await Promise.all([
     prisma.records.findMany({
-      where: { type, is_active: true },
+      where,
       skip,
       take,
     }),
-    prisma.records.count({ where: { type, is_active: true } }),
+    prisma.records.count({ where }),
   ]);
 
   return NextResponse.json(

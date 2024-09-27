@@ -80,6 +80,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
           name: 'Fresh',
         },
       });
+      console.log('req.userId', req.userId);
       const payload = {
         company: String(company),
         website: String(website?.hyperlink),
@@ -99,6 +100,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
         type: 'LEAD',
         status: 'ACTIVE',
         recordStatusId: recordStatus?.id,
+        userId: req.userId,
       };
 
       try {

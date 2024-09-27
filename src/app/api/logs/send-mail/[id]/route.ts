@@ -95,6 +95,21 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       where: { id, is_active: true },
     });
 
+    const user = await prisma.user.findFirst({
+      where: {
+        id: req.userId,
+      },
+      include: {
+        role: true,
+      },
+    });
+
+    if (user && user.role && record && user.role.name !== 'ADMIN') {
+      if (user.id != record.userId) {
+        throw new ApiError(StatusCode.badrequest, 'Record not found!');
+      }
+    }
+
     if (!record) {
       throw new ApiError(StatusCode.badrequest, 'Record not found!');
     }
