@@ -256,4 +256,5 @@ const Lead = ({ data, appendLog }: Interface) => {
     </div>
   );
 };
+
 export default Lead;

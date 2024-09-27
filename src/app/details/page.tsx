@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useSearchParams, useRouter } from 'next/navigation';
 
@@ -19,7 +19,7 @@ import { AppDispatch } from '@/redux/store';
 import { getStatuses } from '@/redux/slices/status-slice';
 import Modal from '../components/Modal';
 
-const Page = () => {
+const Details = () => {
   const [details, setDetails] = useState(null);
   const [loading, setLoading] = useState(false);
   const [phoneLogsData, setPhoneLogsData] = useState([]);
@@ -162,6 +162,14 @@ const Page = () => {
         handleSubmit={navigateToNextRecord}
       />
     </section>
+  );
+};
+
+const Page = () => {
+  return (
+    <Suspense>
+      <Details />
+    </Suspense>
   );
 };
 

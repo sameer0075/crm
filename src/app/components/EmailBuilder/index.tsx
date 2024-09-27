@@ -1,4 +1,4 @@
-import React, { useState, KeyboardEvent } from 'react';
+import React, { useState, KeyboardEvent, Suspense } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSearchParams } from 'next/navigation';
 
@@ -14,8 +14,8 @@ interface EmailComposerInterface {
   email: string;
 }
 
-const EmailComposer: React.FC = ({ email }: EmailComposerInterface) => {
-  const [to, setTo] = useState<string[]>([email]);
+const EmailTemplate: React.FC = ({ email }: EmailComposerInterface) => {
+  const [to, setTo] = useState<string[] | null>([email]);
   const [cc, setCc] = useState<string[]>(['info@novatoresols.com']);
   const [bcc, setBcc] = useState<string[]>([]);
   const [subject, setSubject] = useState<string>('');
@@ -525,6 +525,14 @@ const EmailComposer: React.FC = ({ email }: EmailComposerInterface) => {
         </div>
       )}
     </div>
+  );
+};
+
+const EmailComposer = ({ email }: EmailComposerInterface) => {
+  return (
+    <Suspense>
+      <EmailTemplate email={email} />
+    </Suspense>
   );
 };
 

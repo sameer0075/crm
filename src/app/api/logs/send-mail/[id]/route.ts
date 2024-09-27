@@ -18,12 +18,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 async function getTimeForRound(round: number): Promise<number | null> {
   const setting = await prisma.followUpSettings.findFirst({
     where: { round },

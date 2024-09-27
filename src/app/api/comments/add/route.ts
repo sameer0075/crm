@@ -126,7 +126,7 @@ async function getTimeForRound(round: number): Promise<number | null> {
 const handleRecordVisibility = async (
   record: records,
   recordStatus: record_status,
-  customDate?: Date | null
+  customDate?: string | Date | null
 ) => {
   const now = new Date();
 
@@ -240,7 +240,7 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
 
     if (
       record?.round >= 2 &&
-      recordStatus.name === 'Follow Up on Custom Date'
+      recordStatus?.name === 'Follow Up on Custom Date'
     ) {
       throw new ApiError(
         StatusCode.badrequest,
@@ -261,7 +261,7 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
           id: rest.recordId,
         },
         data: {
-          recordStatusId: notInterestedStatus.id,
+          recordStatusId: notInterestedStatus?.id,
           type: 'NOT_INTERESTED_LEAD',
         },
       });
@@ -275,7 +275,7 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
           },
         },
         eventCreation: new Date(),
-        from: user.phone,
+        from: user?.phone,
       };
 
       const logData = await prisma.activity_logs.create({ data: logPayload });
@@ -307,7 +307,10 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
       statusValidation(record.recordStatus.name, recordStatus.name);
     }
 
-    const recordType = await evaluateRecordType(recordStatus?.name, record?.id);
+    const recordType: string = await evaluateRecordType(
+      recordStatus?.name,
+      record?.id
+    );
     const data = await prisma.comments.create({
       data: {
         ...rest,
@@ -324,17 +327,17 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
         },
       },
       eventCreation: new Date(),
-      from: user.phone,
+      from: user?.phone,
     };
 
     const activityLog = await prisma.activity_logs.create({ data: logPayload });
     if (
-      record.type === 'OPPORTUNITY' ||
-      record.type === 'FOLLOW_UP_OPPORTUNITY'
+      record?.type === 'OPPORTUNITY' ||
+      record?.type === 'FOLLOW_UP_OPPORTUNITY'
     ) {
       if (
-        recordStatus.name == 'Keep on Follow Up' ||
-        recordStatus.name == 'Follow Up on Custom Date'
+        recordStatus?.name == 'Keep on Follow Up' ||
+        recordStatus?.name == 'Follow Up on Custom Date'
       ) {
         const visibility = await handleRecordVisibility(
           record,
@@ -369,13 +372,13 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
 
     let nextRecordId;
     if (
-      recordStatus.name === 'Book A Meeting' ||
-      recordStatus.name === 'Connected & Email Sent'
+      recordStatus?.name === 'Book A Meeting' ||
+      recordStatus?.name === 'Connected & Email Sent'
     ) {
       const nextRecord = await prisma.records.findFirst({
         where: {
           autoNumber: {
-            gt: record.autoNumber,
+            gt: record?.autoNumber,
           },
           type: 'LEAD',
           is_active: true,
@@ -384,7 +387,7 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
           autoNumber: 'asc',
         },
       });
-      nextRecordId = nextRecord.id;
+      nextRecordId = nextRecord?.id;
     }
 
     return NextResponse.json(

@@ -17,12 +17,6 @@ import {
 import { RoleGuard } from '@/lib/middleware/role-guard';
 const prisma = new PrismaClient();
 
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
-
 const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
   try {
     const formData = await req.formData();
