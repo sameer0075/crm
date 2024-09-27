@@ -25,7 +25,7 @@ const ActivityLogsListHandler = async (
       throw new ApiError(StatusCode.badrequest, 'Record id is required!');
     }
 
-    const record = await prisma.user.findFirst({
+    const record = await prisma.records.findFirst({
       where: {
         id,
         is_active: true,
@@ -84,6 +84,7 @@ const ActivityLogsListHandler = async (
       { status: StatusCode.success }
     );
   } catch (error) {
+    console.log('error', error);
     throw new ApiError(StatusCode.badrequest, error.message);
   }
 };

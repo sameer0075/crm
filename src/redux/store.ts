@@ -5,6 +5,7 @@ import leadsSlice from './slices/lead-slice';
 import logsSlice from './slices/logs-slice';
 import commentSlice from './slices/commentSlice';
 import statusSlice from './slices/status-slice';
+import reportSlice from './slices/report-slice';
 
 export const rootReducer = combineReducers({
   auth: authSlice,
@@ -12,6 +13,7 @@ export const rootReducer = combineReducers({
   logs: logsSlice,
   comments: commentSlice,
   status: statusSlice,
+  report: reportSlice,
 });
 
 export const store = configureStore({

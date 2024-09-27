@@ -114,12 +114,6 @@ const MailLogHandler = async (req: NextRequest): Promise<NextResponse> => {
       throw new ApiError(StatusCode.badrequest, 'Record not found!');
     }
 
-    const user = await prisma.user.findFirst({
-      where: {
-        id: req.userId,
-      },
-    });
-
     const transporter = nodemailer.createTransport({
       host: process.env.EMAIL_HOST,
       port: 587,

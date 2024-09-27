@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 const initialState = {
   isLoading: <boolean>false,
   token: <string | null>null,
+  users: [],
 };
 
 export const login = createAsyncThunk(
@@ -22,6 +23,16 @@ export const login = createAsyncThunk(
   }
 );
 
+export const getUsersList = createAsyncThunk('users/list', async (thunkAPI) => {
+  try {
+    const url = `${AuthEndpoints.usersList()}`;
+    const resp = await api.get(`${url}`);
+    return resp;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.response.data);
+  }
+});
+
 const authSlice = createSlice({
   name: 'auth',
   initialState,
@@ -36,11 +47,26 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         sessionStorage.setItem('token', action.payload.token);
         toast.info(action.payload.message, 3000);
-        // setTimeout(() => {
-        //   window.location.href = '/leads';
-        // }, 1500);
       })
       .addCase(login.rejected, (state, action) => {
+        toast.error(action.payload.message);
+        state.isLoading = false;
+      })
+
+      .addCase(getUsersList.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getUsersList.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.users = action.payload.data;
+      })
+      .addCase(getUsersList.rejected, (state, action) => {
+        if (action.payload.message === 'Unauthorized') {
+          sessionStorage.removeItem('token');
+          setTimeout(() => {
+            window.location.href = '/';
+          }, 2000);
+        }
         toast.error(action.payload.message);
         state.isLoading = false;
       });

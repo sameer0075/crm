@@ -1,5 +1,6 @@
 const AuthEndpoints = {
   loginUser: () => `/auth/login`,
+  usersList: () => '/users',
 };
 
 const LeadEndpoints = {
@@ -19,6 +20,10 @@ const CommentsEndpoints = {
   addComment: () => `/comments/add`,
 };
 
+const DashboardEndpoints = {
+  dashboardReport: () => `/dashboard`,
+};
+
 const StatusEndpoints = {
   statusList: (id: string) => `/status/list/${id}`,
 };
@@ -29,4 +34,5 @@ export {
   ActivityLogs,
   CommentsEndpoints,
   StatusEndpoints,
+  DashboardEndpoints,
 };

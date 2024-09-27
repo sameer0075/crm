@@ -25,6 +25,7 @@ model user {
   phone     String?
   smtpSettings user_smtp_settings?
   records records[]
+  logs activity_logs[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -131,6 +132,8 @@ model activity_logs {
   body    String? //for message type
   media   Json?  // for message type
   audio   Json?
+  userId  String? @db.Uuid
+  user    user?     @relation(fields: [userId], references: [id]) // Many-to-one relation with User
   eventPayload  Json?
   record              records?       @relation(fields: [recordId], references: [id])
   notFoundText        String?

@@ -5,7 +5,7 @@ export default function Subheader() {
   return (
     <nav className="flex h-[39px] items-center justify-between border-b border-gray-200 bg-white px-4 py-2">
       <ul className="flex space-x-4 overflow-auto">
-        <Link href="/" prefetch={true}>
+        <Link href="/dashboard" prefetch={true}>
           <div className="flex pt-1">
             <Home className="pr-2" />
             <label>Home</label>
