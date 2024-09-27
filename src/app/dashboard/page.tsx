@@ -10,6 +10,7 @@ import {
   Presentation,
 } from 'lucide-react';
 import DatePicker from 'react-datepicker';
+import { jwtDecode } from 'jwt-decode';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import { getDashboardInsights } from '@/redux/slices/report-slice';
@@ -126,6 +127,12 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
+  const token = sessionStorage.getItem('token');
+  let decoded;
+  if (token) {
+    decoded = jwtDecode(token);
+  }
+
   return (
     <div>
       <div className="flex m-4 justify-center">
@@ -133,6 +140,8 @@ const Dashboard = () => {
           <label>Start Date</label> <br />
           <DatePicker
             selected={startDate}
+            showTimeSelect
+            timeFormat="HH:mm"
             onChange={(date) => handleDate(date, 'start')}
             className={`p-2 border border-gray-300 rounded-md h-full w-full`}
           />
@@ -146,23 +155,25 @@ const Dashboard = () => {
             className={`p-2 border border-gray-300 rounded-md h-full w-full`}
           />
         </div>
-        <div className="ml-2 mt-6">
-          <select
-            onChange={handleStatus}
-            className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded shadow leading-tight focus:outline-none focus:ring focus:border-blue-500"
-          >
-            <option value="" selected>
-              Select your option
-            </option>
-            {users.map((user, index: number) => {
-              return (
-                <option key={index} value={user.id}>
-                  {user.name}
-                </option>
-              );
-            })}
-          </select>
-        </div>
+        {decoded && decoded.role === 'admin' && (
+          <div className="ml-2 mt-6">
+            <select
+              onChange={handleStatus}
+              className="block appearance-none w-full bg-white border border-gray-300 text-gray-700 py-2 px-4 pr-8 rounded shadow leading-tight focus:outline-none focus:ring focus:border-blue-500"
+            >
+              <option value="" selected>
+                Select your option
+              </option>
+              {users.map((user, index: number) => {
+                return (
+                  <option key={index} value={user.id}>
+                    {user.name}
+                  </option>
+                );
+              })}
+            </select>
+          </div>
+        )}
         <div className="ml-2 mt-6">
           <Button
             handleClick={handleSubmit}
