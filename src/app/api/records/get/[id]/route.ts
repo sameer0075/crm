@@ -23,6 +23,9 @@ const GetRecordHandler = async (req: NextRequest): Promise<NextResponse> => {
 
   const record = await prisma.records.findFirst({
     where: { id, is_active: true },
+    include: {
+      recordStatus: true,
+    },
   });
 
   if (!record) {

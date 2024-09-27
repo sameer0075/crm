@@ -15,15 +15,18 @@ const initialState = {
   data: <StatusInterface[]>[],
 };
 
-export const getStatuses = createAsyncThunk('status/list', async (thunkAPI) => {
-  try {
-    const url = `${StatusEndpoints.statusList()}`;
-    const resp = await api.get(`${url}`);
-    return resp;
-  } catch (error) {
-    return thunkAPI.rejectWithValue(error.response.data);
+export const getStatuses = createAsyncThunk(
+  'status/list',
+  async (data: { id: string }, thunkAPI) => {
+    try {
+      const url = `${StatusEndpoints.statusList(data.id)}`;
+      const resp = await api.get(`${url}`);
+      return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
   }
-});
+);
 
 const statusSlice = createSlice({
   name: 'status',

@@ -15,7 +15,7 @@ import { toast } from 'react-toastify';
 import TextArea from '../../TextArea';
 import Select from '../../Select';
 import Button from '../../Button';
-import { StatusInterface } from '@/redux/slices/status-slice';
+import { StatusInterface, getStatuses } from '@/redux/slices/status-slice';
 
 interface Interface {
   data: CommentsIterface[];
@@ -85,6 +85,7 @@ const Lead = ({ data, appendLog }: Interface) => {
       })
     ).unwrap();
     if (res.success) {
+      setStartDate(null);
       const statusData = statuses.find((info) => info.id === status);
       toast.info(res.message);
       setComment('');
@@ -92,39 +93,29 @@ const Lead = ({ data, appendLog }: Interface) => {
       if (res.nextRecordId) {
         dispatch(setNextRecord({ id: res.nextRecordId }));
       }
+      dispatch(getStatuses({ id }));
       handleStatusDisability(statusData);
     }
   };
 
   useEffect(() => {
     if (details) {
-      let recordStatuses = [];
-      if (details.type === 'LEAD' || details.type === 'FOLLOW_UP_LEAD') {
-        recordStatuses = statuses.filter(
-          (info) =>
-            info.statusFor === 'LEAD' || info.statusFor === 'FOLLOW_UP_LEAD'
-        );
-      } else if (
-        details.type === 'OPPORTUNITY' ||
-        details.type === 'FOLLOW_UP_OPPORTUNITY'
-      ) {
-        recordStatuses = statuses.filter(
-          (info) =>
-            info.statusFor === 'OPPORTUNITY' ||
-            info.statusFor === 'FOLLOW_UP_OPPORTUNITY'
-        );
-      }
-      const currentStatus = statuses.find(
-        (info) => info.id === details.recordStatusId
-      );
+      const currentStatus = statuses.find((info) => {
+        if (status) {
+          return info.id === status;
+        } else {
+          return info.id === details.recordStatusId;
+        }
+      });
+      console.log('currentStatus', currentStatus);
       setStatus(currentStatus?.id);
-      setStatusOptions(recordStatuses);
+      setStatusOptions(statuses);
       handleStatusDisability(currentStatus);
     }
   }, [details, statuses]);
 
   const currentStatus = statuses.find((info) => info.id === status);
-
+  console.log('status', status);
   return (
     <div className="w-full flex justify-center px-4 sm:px-0">
       <div className="w-full sm:w-[500px] md:w-[600px] p-4 sm:p-6 lg:w-[670px] flex-shrink-0 ">
@@ -174,12 +165,9 @@ const Lead = ({ data, appendLog }: Interface) => {
             {details?.phone ?? 'N/A'}
           </div>
         </div>
-        <p className="text-[#3673D4] font-medium text-xs font-roboto pt-4">
-          Guidance for Success
-        </p>
-        {data?.length === 0 && (
-          <p className="text-[#111] pt-2 text-center font-medium text-xs font-roboto">
-            No Data Found
+        {currentStatus?.name !== 'Fresh' && (
+          <p className="text-[#3673D4] font-medium text-xs font-roboto pt-4">
+            Guidance for Success / Pre Research Information
           </p>
         )}
         <ul className="list-disc px-5 py-4">

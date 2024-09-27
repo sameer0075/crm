@@ -93,6 +93,21 @@ export const getOpportunities = createAsyncThunk(
   }
 );
 
+export const getAppointments = createAsyncThunk(
+  'appointments/list',
+  async (data: { type: string; page: number; pageSize: number }, thunkAPI) => {
+    try {
+      const url = `${LeadEndpoints.opportunityList(data.type)}`;
+      const resp = await api.get(
+        `${url}?page=${data.page}&pageSize=${data.pageSize}`
+      );
+      return resp;
+    } catch (error) {
+      return thunkAPI.rejectWithValue(error.response.data);
+    }
+  }
+);
+
 export const getFollowUpOpportunities = createAsyncThunk(
   'follow-up-opportunities/list',
   async (data: { type: string; page: number; pageSize: number }, thunkAPI) => {
@@ -191,6 +206,28 @@ const leadsSlice = createSlice({
       })
       .addCase(
         getOpportunities.rejected,
+        (state, action: { payload: { message: string } }) => {
+          if (action.payload.message === 'Unauthorized') {
+            sessionStorage.removeItem('token');
+            setTimeout(() => {
+              window.location.href = '/';
+            }, 2000);
+          }
+          toast.error(action.payload.message);
+          state.isLoading = false;
+        }
+      )
+
+      .addCase(getAppointments.pending, (state) => {
+        state.isLoading = true;
+      })
+      .addCase(getAppointments.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.data = action.payload.data;
+        state.count = action.payload.totalCount;
+      })
+      .addCase(
+        getAppointments.rejected,
         (state, action: { payload: { message: string } }) => {
           if (action.payload.message === 'Unauthorized') {
             sessionStorage.removeItem('token');

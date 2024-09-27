@@ -157,10 +157,24 @@ const handleRecordVisibility = async (
 };
 
 const statusValidation = (recordStatusName: string, statusName: string) => {
+  if (recordStatusName === 'Fresh' && statusName === 'Fresh') {
+    throw new ApiError(
+      StatusCode.badrequest,
+      'Fresh Status cannot be selected again!'
+    );
+  }
+
   if (recordStatusName == 'Pre Research' && statusName == 'Fresh') {
     throw new ApiError(
       StatusCode.badrequest,
       'Previous Status Code cannot be selected!'
+    );
+  }
+
+  if (recordStatusName === 'Pre Research' && statusName === 'Pre Research') {
+    throw new ApiError(
+      StatusCode.badrequest,
+      'Pre Research Status cannot be selected again!'
     );
   }
 
@@ -183,11 +197,12 @@ const statusValidation = (recordStatusName: string, statusName: string) => {
     recordStatusName === 'Call Connected & Interested' &&
     (statusName == "Did'nt Connect" ||
       statusName == 'Voicemail' ||
-      statusName == 'Receptionist')
+      statusName == 'Receptionist' ||
+      statusName === 'Call Connected & Interested')
   ) {
     throw new ApiError(
       StatusCode.badrequest,
-      'Previous Status Code cannot be selected!'
+      'Previous or Same Status Code cannot be selected!'
     );
   }
 
@@ -329,7 +344,7 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
       eventCreation: new Date(),
       from: user?.phone,
     };
-
+    console.log('recordType', recordType, record?.type);
     const activityLog = await prisma.activity_logs.create({ data: logPayload });
     if (
       record?.type === 'OPPORTUNITY' ||
@@ -357,8 +372,19 @@ const AddCommentHandler = async (req: NextRequest): Promise<NextResponse> => {
             round: visibility.round,
           },
         });
+      } else {
+        await prisma.records.update({
+          where: {
+            id: rest.recordId,
+          },
+          data: {
+            recordStatusId: status,
+            type: recordType,
+          },
+        });
       }
     } else {
+      console.log('recordType', recordType);
       await prisma.records.update({
         where: {
           id: rest.recordId,

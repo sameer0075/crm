@@ -26,6 +26,7 @@ const CallActivity = ({ data }: LogsInterface) => {
               .toISOString()
               .split('T')[1]
               .split('.')[0];
+
             return (
               <div key={index} className="flex items-center mb-6 relative ">
                 <div
@@ -74,8 +75,33 @@ const CallActivity = ({ data }: LogsInterface) => {
                       You logged {step.type === 'email' ? 'an' : 'a'}{' '}
                       {step.type.toLowerCase()}
                     </p>
-                    <p>{step.callDuration ?? `${datePart} ${timePart}`}</p>
+                    <p>
+                      {step.callDuration ? (
+                        <span>
+                          {datePart} {timePart}/ {step.callDuration}
+                        </span>
+                      ) : (
+                        `${datePart} ${timePart}`
+                      )}
+                    </p>
                   </div>
+                  {step.type == 'call' && step.audio && (
+                    <div>
+                      {step.audio.map(
+                        (
+                          audio: { url: string; type: string },
+                          index: number
+                        ) => {
+                          return (
+                            <audio key={index} controls>
+                              <source src={audio.url} type={audio.type} />
+                              Your browser does not support the audio element.
+                            </audio>
+                          );
+                        }
+                      )}
+                    </div>
+                  )}
                 </div>
                 {index < data?.length - 1 && (
                   <div className="absolute left-3 top-12 w-[2px] h-[70%] bg-[#72D436]" />

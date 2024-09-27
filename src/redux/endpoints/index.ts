@@ -20,7 +20,7 @@ const CommentsEndpoints = {
 };
 
 const StatusEndpoints = {
-  statusList: () => `/status/list`,
+  statusList: (id: string) => `/status/list/${id}`,
 };
 
 export {

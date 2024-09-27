@@ -43,38 +43,66 @@ const OpenPhoneHandler = async (req: NextRequest) => {
       event.data.object.completedAt
     );
     if (record) {
-      const payload = {
-        type: event.data.object.object,
-        logType: 'LEAD',
-        openPhoneType: event.type,
-        callDuration: String(differenceInSeconds),
-        record: {
-          connect: {
-            id: record?.id,
+      if (event.type == 'call.recording.completed') {
+        const log = await prisma.activity_logs.findFirst({
+          where: {
+            messageCallId: event.data.object.id,
           },
-        },
-        openphoneId: event.id,
-        openPhoneVersion: event.apiVersion,
-        eventCreation: event.createdAt,
-        messageCallId: event.data.object.id,
-        from: event.data.object.from,
-        to: event.data.object.to,
-        direction: event.data.object.direction,
-        status: event.data.object.status,
-        openPhoneUserId: event.data.object.userId,
-        phoneNumberId: event.data.object.phoneNumberId,
-        conversationId: event.data.object.conversationId,
-        eventPayload: JSON.stringify(event),
-      };
+        });
 
-      await prisma.activity_logs.create({ data: payload });
-      return NextResponse.json(
-        {
-          success: true,
-          message: 'OpenPhone Call Log Synced',
-        },
-        { status: StatusCode.success }
-      );
+        if (log) {
+          console.log('event.data.object.media', event.data.object.media);
+          await prisma.activity_logs.update({
+            where: {
+              id: log.id,
+            },
+            data: {
+              audio: event.data.object.media,
+            },
+          });
+
+          return NextResponse.json(
+            {
+              success: true,
+              message: 'OpenPhone Call Log Synced',
+            },
+            { status: StatusCode.success }
+          );
+        }
+      } else {
+        const payload = {
+          type: event.data.object.object,
+          logType: 'LEAD',
+          openPhoneType: event.type,
+          callDuration: String(differenceInSeconds),
+          record: {
+            connect: {
+              id: record?.id,
+            },
+          },
+          openphoneId: event.id,
+          openPhoneVersion: event.apiVersion,
+          eventCreation: event.createdAt,
+          messageCallId: event.data.object.id,
+          from: event.data.object.from,
+          to: event.data.object.to,
+          direction: event.data.object.direction,
+          status: event.data.object.status,
+          openPhoneUserId: event.data.object.userId,
+          phoneNumberId: event.data.object.phoneNumberId,
+          conversationId: event.data.object.conversationId,
+          eventPayload: JSON.stringify(event),
+        };
+
+        await prisma.activity_logs.create({ data: payload });
+        return NextResponse.json(
+          {
+            success: true,
+            message: 'OpenPhone Call Log Synced',
+          },
+          { status: StatusCode.success }
+        );
+      }
     } else {
       await prisma.failed_activity_logs.create({
         data: {

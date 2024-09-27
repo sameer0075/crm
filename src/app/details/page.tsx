@@ -57,7 +57,7 @@ const Details = () => {
         dispatch(leadDetails({ id })).unwrap(),
         dispatch(getComments({ id })).unwrap(),
         dispatch(getLogs({ id, type: 'all' })).unwrap(),
-        dispatch(getStatuses()).unwrap(),
+        dispatch(getStatuses({ id })).unwrap(),
       ])
         .then(() => {
           setLoading(false);

@@ -127,6 +127,7 @@ model activity_logs {
   conversationId  String?
   body    String? //for message type
   media   Json?  // for message type
+  audio   Json?
   eventPayload  Json?
   record              records?       @relation(fields: [recordId], references: [id])
   notFoundText        String?
