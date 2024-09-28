@@ -11,7 +11,6 @@ import { removeSensitiveFields } from '@/utils/helper-functions';
 
 const prisma = new PrismaClient();
 
-
 const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();
   const { email, password } = loginSchema.parse(body);
