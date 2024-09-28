@@ -10,7 +10,7 @@ import { PrismaClient } from '@prisma/client';
 // Add PrismaClient to the global type if it doesn't exist
 declare global {
   // Prevents the TypeScript compiler from complaining about redeclaring the PrismaClient in development mode
-  var prisma: PrismaClient | undefined;
+  let prisma: PrismaClient | undefined;
 }
 
 // Use a singleton pattern to prevent exhausting database connections in serverless environments
