@@ -9,17 +9,7 @@ import { StatusCode } from '@/utils/enums';
 import { loginSchema } from '@/utils/schemas/auth.schema';
 import { removeSensitiveFields } from '@/utils/helper-functions';
 
-// const prisma = new PrismaClient();
-let prisma: PrismaClient;
-
-if (process.env.NODE_ENV === 'production') {
-  prisma = new PrismaClient();
-} else {
-  if (!global.prisma) {
-    global.prisma = new PrismaClient();
-  }
-  prisma = global.prisma;
-}
+const prisma = new PrismaClient();
 
 
 const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
