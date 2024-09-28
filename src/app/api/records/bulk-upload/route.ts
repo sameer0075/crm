@@ -1,5 +1,4 @@
 import { NextResponse, NextRequest } from 'next/server';
-import { PrismaClient } from '@prisma/client';
 import { ApiError } from 'next/dist/server/api-utils';
 import { globalErrorHandler } from '@/lib/error-handling/error-handler';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';

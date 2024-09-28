@@ -3,7 +3,6 @@ import bcrypt from 'bcryptjs';
 import { ApiError } from 'next/dist/server/api-utils';
 
 import { globalErrorHandler } from '@/lib/error-handling/error-handler';
-import { PrismaClient } from '@prisma/client';
 import { signupSchema } from '@/utils/schemas/auth.schema';
 import { StatusCode } from '@/utils/enums';
 import { removeSensitiveFields } from '@/utils/helper-functions';

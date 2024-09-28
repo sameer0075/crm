@@ -2,7 +2,6 @@ import { NextResponse, NextRequest } from 'next/server';
 
 import { ApiError } from 'next/dist/server/api-utils';
 import { globalErrorHandler } from '@/lib/error-handling/error-handler';
-import { PrismaClient } from '@prisma/client';
 import { StatusCode } from '@/utils/enums';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';

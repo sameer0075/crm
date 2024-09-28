@@ -5,7 +5,6 @@ import { v2 as cloudinary } from 'cloudinary';
 import nodemailer from 'nodemailer';
 
 import { globalErrorHandler } from '@/lib/error-handling/error-handler';
-import { PrismaClient, record_status, records } from '@prisma/client';
 import { StatusCode } from '@/utils/enums';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';

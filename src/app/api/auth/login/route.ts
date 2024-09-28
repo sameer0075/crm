@@ -4,7 +4,6 @@ import * as jwt from 'jsonwebtoken';
 
 import { ApiError } from 'next/dist/server/api-utils';
 import { globalErrorHandler } from '@/lib/error-handling/error-handler';
-import { PrismaClient } from '@prisma/client';
 import { StatusCode } from '@/utils/enums';
 import { loginSchema } from '@/utils/schemas/auth.schema';
 import { removeSensitiveFields } from '@/utils/helper-functions';
