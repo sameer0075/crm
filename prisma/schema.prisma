@@ -79,15 +79,15 @@ model records {
   lastName String
   autoNumber Int @default(autoincrement())
   statusCode  Int @default(autoincrement())
-  fullName  String
+  fullName  String?
   title String?
   email String
   company String
   phone String
   type  String
   status String @default("ACTIVE")
-  recordStatusId    String  @db.Uuid
-  recordStatus  record_status @relation(fields: [recordStatusId], references: [id])
+  recordStatusId    String?  @db.Uuid
+  recordStatus  record_status? @relation(fields: [recordStatusId], references: [id])
   website String
   industry String?
   lead_source String @default("EMAIL")
@@ -103,8 +103,8 @@ model records {
   round          Int?
   comments    comments[]
   logs    activity_logs[]
-  userId  String @db.Uuid
-  user    user     @relation(fields: [userId], references: [id]) // Many-to-one relation with User
+  userId  String? @db.Uuid
+  user    user?     @relation(fields: [userId], references: [id]) // Many-to-one relation with User
   is_active Boolean? @default(true)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
