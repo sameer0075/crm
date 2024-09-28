@@ -9,8 +9,7 @@ import { StatusCode } from '@/utils/enums';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
 import { commentsSchema } from '@/utils/schemas/comment.schema';
 import { timeConversion } from '@/utils/helper-functions';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 const generateCallError = async (
   phoneLogsCount: number,

@@ -7,7 +7,7 @@ import { StatusCode } from '@/utils/enums';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
 
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 /**
  * Handles the GET request to fetch records by type.

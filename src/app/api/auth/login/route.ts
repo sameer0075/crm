@@ -8,8 +8,7 @@ import { PrismaClient } from '@prisma/client';
 import { StatusCode } from '@/utils/enums';
 import { loginSchema } from '@/utils/schemas/auth.schema';
 import { removeSensitiveFields } from '@/utils/helper-functions';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 const loginHandler = async (req: NextRequest): Promise<NextResponse> => {
   const body = await req.json();

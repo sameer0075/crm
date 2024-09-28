@@ -5,7 +5,7 @@ import { globalErrorHandler } from '@/lib/error-handling/error-handler';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';
 import { StatusCode } from '@/utils/enums';
 import { RoleGuard } from '@/lib/middleware/role-guard';
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 const usersListHandler = async (): Promise<NextResponse> => {
   try {

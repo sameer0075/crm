@@ -9,7 +9,7 @@ import { StatusCode } from '@/utils/enums';
 import { recordsSchema } from '@/utils/schemas/records.schema';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
 
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 /**
  * Handles the PUT request to delete a record.

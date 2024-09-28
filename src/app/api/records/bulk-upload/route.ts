@@ -15,7 +15,7 @@ import {
   validateEmail,
 } from '@/utils/helper-functions';
 import { RoleGuard } from '@/lib/middleware/role-guard';
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
   try {
@@ -33,7 +33,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
       );
     }
 
-    const tempDir = '/tmp'
+    const tempDir = '/tmp';
     const tempFilePath = join(tempDir, 'uploaded-file.xlsx');
     // Create Path if not present
     await fileHandling(tempDir, tempFilePath, file);
@@ -159,7 +159,7 @@ const bulkUploadHandler = async (req: NextRequest): Promise<NextResponse> => {
     console.log(error);
     throw new ApiError(StatusCode.internalservererror, error.message);
   } finally {
-    const tempDir = '/tmp'
+    const tempDir = '/tmp';
     const tempFilePath = join(tempDir, 'uploaded-file.xlsx');
     if (existsSync(tempFilePath)) {
       await unlinkSync(tempFilePath);

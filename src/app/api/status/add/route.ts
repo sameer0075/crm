@@ -8,7 +8,7 @@ import { PrismaClient } from '@prisma/client';
 import { StatusCode } from '@/utils/enums';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
 
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 const AddStatusHandler = async (req: NextRequest): Promise<NextResponse> => {
   const payload = await req.json();

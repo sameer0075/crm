@@ -10,7 +10,7 @@ import { StatusCode } from '@/utils/enums';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
 import { timeConversion } from '@/utils/helper-functions';
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,

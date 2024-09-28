@@ -6,7 +6,7 @@ import { PrismaClient } from '@prisma/client';
 import { StatusCode } from '@/utils/enums';
 import { composeMiddlewares } from '@/lib/middleware/middleware-composer';
 import { jwtMiddleware } from '@/lib/middleware/auth-middleware';
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 type WhereType = {
   type: string;

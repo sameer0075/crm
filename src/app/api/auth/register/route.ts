@@ -7,8 +7,7 @@ import { PrismaClient } from '@prisma/client';
 import { signupSchema } from '@/utils/schemas/auth.schema';
 import { StatusCode } from '@/utils/enums';
 import { removeSensitiveFields } from '@/utils/helper-functions';
-
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 /**
  * The API handler for registering a new user.

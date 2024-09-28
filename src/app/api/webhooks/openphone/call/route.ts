@@ -4,7 +4,7 @@ import { globalErrorHandler } from '@/lib/error-handling/error-handler';
 import { StatusCode } from '@/utils/enums';
 import { PrismaClient } from '@prisma/client';
 
-const prisma = new PrismaClient();
+import prisma from '@/lib/prisma'; // Import your Prisma client singleton
 
 function formatTimeDifference(date1, date2) {
   // Convert the date strings to Date objects if they are not already
