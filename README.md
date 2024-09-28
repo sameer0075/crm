@@ -7,4 +7,4 @@
 - Seed Database command: npm run seed
 - Admin Credentials:
   email: admin@gmail.com
-  password: password1234
+  password: password12345
